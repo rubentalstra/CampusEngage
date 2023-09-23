@@ -6,8 +6,12 @@ const helmet = require('helmet');
 const fs = require('fs');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const passport = require('./src/config/passport');
-const router = require('./src/routes/mainRoutes');
+const passportUser = require('./src/config/passportUsers');
+const passportAdmins = require('./src/config/passportAdmins');
+const { validPassword } = require('./src/utilities/crypto');
+const userRouter = require('./src/routes/userRoutes');
+const { getHomePage } = require('./src/controller/mainController');
+const adminRouter = require('./src/routes/adminRoutes');
 const MySQLStore = require('express-mysql-session')(session);
 
 
@@ -48,11 +52,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Session configuration
-app.use(session({
-    name: process.env.SESSION_KEY,
-    key: process.env.SESSION_KEY,
-    secret: process.env.SESSION_SECRET,
+
+// Initialize Passport and session
+// Separate session and passport middleware for Users
+app.use('/user*', session({
+    name: 'userSession',
+    key: process.env.USER_SESSION_KEY,
+    secret: process.env.USER_SESSION_SECRET,
     store: new MySQLStore({
         host: process.env.MYSQL_SERVER,
         port: process.env.MYSQL_PORT,
@@ -62,16 +68,36 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        httpOnly: true,  // Add this
+        httpOnly: true,
         secure: true,
-        maxAge: 1000 * 60 * 60 // 1 hour, adjust as per your needs
+        maxAge: 1000 * 60 * 60
     }
 }));
+app.use('/user*', passportUser.initialize());
+app.use('/user*', passportUser.session());
 
-// Initialize Passport and session
-app.use(passport.initialize());
-app.use(passport.session());
 
+// Separate session and passport middleware for Admins
+app.use('/admin*', session({
+    name: 'adminSession',
+    key: process.env.ADMIN_SESSION_KEY,
+    secret: process.env.ADMIN_SESSION_SECRET,
+    store: new MySQLStore({
+        host: process.env.MYSQL_SERVER,
+        port: process.env.MYSQL_PORT,
+        user: process.env.DB_USER,
+        database: process.env.DB_NAME1
+    }),
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: true,
+        maxAge: 1000 * 60 * 60
+    }
+}));
+app.use('/admin*', passportAdmins.initialize());
+app.use('/admin*', passportAdmins.session());
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -84,7 +110,9 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Use the mainRoutes for handling routes
-app.use('/', router);
+app.get('/', getHomePage);
+app.use('/user', userRouter);
+app.use('/admin', adminRouter);
 
 // HTTPS server setup
 const options = {
