@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup 2FA</title>
+</head>
+
+<body>
+  <h2>Setup Two-Factor Authentication</h2>
+  <p>Scan the QR Code below using your 2FA application (e.g., Google Authenticator or Authy):</p>
+  <% if (qrCode) { %>
+  <img src="<%= qrCode %>" alt="Scan this QR Code with your 2FA app">
+  <% } %>
+  <p>Or manually enter this secret code in your 2FA app: <strong><%= secret %></strong></p>
+
+  <form action="/verify-2fa" method="post">
+    <label for="token">Enter the token from your 2FA application:</label>
+    <input type="text" id="token" name="token" required>
+    <button type="submit">Verify & Set up 2FA</button>
+  </form>
+  <% if (typeof error !== 'undefined') { %>
+  <p style="color: red;"><%= error %></p>
+  <% } %>
+</body>
+
+</html>

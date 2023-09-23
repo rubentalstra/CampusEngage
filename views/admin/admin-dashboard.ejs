@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Admin Dashboard</title>
+</head>
+
+<body>
+  <h1>Admin Dashboard</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(user => { %>
+      <tr>
+        <td><%= user.id %></td>
+        <td><%= user.first_name %> <%= user.primary_last_name_main %></td>
+        <td><%= user.emailadres %></td>
+        <td>
+          <button onclick="sendEmail('<%= user.id %>')">Send Email</button>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+
+  <script>
+    function sendEmail(userId) {
+      fetch('/admin/send-password-setup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: userId
+        })
+      }).then(res => {
+        if (res.ok) {
+          alert("Password setup email sent!");
+        } else {
+          alert("Failed to send email.");
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>

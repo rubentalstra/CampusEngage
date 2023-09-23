@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Image Management</title>
+</head>
+
+<body>
+  <h1>Welcome <%= user.username %></h1>
+
+  <h2>Upload or Update Profile Picture</h2>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="profilePic" required>
+    <br>
+    <label>
+      Public:
+      <input type="checkbox" name="public" value="true">
+    </label>
+    <br>
+    <input type="hidden" name="userId" value="<%= user.id %>">
+    <button type="submit">Upload</button>
+  </form>
+
+  <% if (imagePath) { %>
+  <h2>Your Current Profile Picture:</h2>
+  <img src="/view/<%= user.id %>" alt="Profile Picture" width="200">
+
+  <h2>Delete Profile Picture</h2>
+  <form action="/delete/<%= user.id %>" method="post">
+    <button type="submit">Delete</button>
+  </form>
+  <% } else { %>
+  <p>You haven't uploaded a profile picture yet.</p>
+  <% } %>
+</body>
+
+</html>

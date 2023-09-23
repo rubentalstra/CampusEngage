@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Registration Page</title>
+</head>
+
+<body>
+  <h1>Registration Form</h1>
+
+  <form action="/user/register" method="post">
+    <label for="type_name">Type:</label>
+    <select name="type_name" required>
+      <option value="Aspirant-lid">Aspirant-lid</option>
+      <option value="Donateur">Donateur</option>
+    </select><br>
+
+    <label for="initials">Initials:</label>
+    <input type="text" name="initials"><br>
+
+    <label for="first_name">First Name:</label>
+    <input type="text" name="first_name" required><br>
+
+    <label for="primary_last_name_prefix">Last Name Prefix:</label>
+    <input type="text" name="primary_last_name_prefix"><br>
+
+    <label for="primary_last_name_main">Last Name:</label>
+    <input type="text" name="primary_last_name_main" required><br>
+
+    <label for="geslacht">Gender:</label>
+    <select name="geslacht" required>
+      <option value="m">Male</option>
+      <option value="f">Female</option>
+      <option value="o">Other</option>
+    </select><br>
+
+    <label for="geboortedatum">Birth Date:</label>
+    <input type="date" name="geboortedatum" required><br>
+
+    <label for="emailadres">Email:</label>
+    <input type="email" name="emailadres" required><br>
+
+
+    <label for="studentnummer">Student Number:</label>
+    <input type="number" name="studentnummer" required><br>
+
+    <label for="lid_sinds">Member Since:</label>
+    <input type="date" name="lid_sinds" required><br>
+
+    <button type="submit">Register</button>
+  </form>
+</body>
+
+</html>
