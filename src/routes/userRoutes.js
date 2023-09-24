@@ -90,6 +90,7 @@ userRouter.get('/agenda', ensureAuthenticatedUser, userEnsure2fa, (req, res) => 
 
 
 
+
 /**
  * IMAGE SETUP
  */

@@ -6,6 +6,10 @@ const userRouter = require('./userRoutes');
 const connection = require('../config/database');
 const transporter = require('../utilities/mailer');
 const { generateToken } = require('../utilities/crypto');
+const { updatePdfFields } = require('../middleware/pdf');
+const { convertToMySQLDate } = require('../middleware/utils');
+const { v4: uuidv4 } = require('uuid'); // Ensure you have the 'uuid' package installed
+
 
 
 router.use((req, res, next) => {
@@ -45,6 +49,69 @@ router.use('/mijn-realtime', userRouter);
 
 router.get('/mijn-realtime', (req, res) => {
     res.redirect('/mijn-realtime/profiel');
+});
+
+router.get('/lid-worden', (req, res) => {
+    res.render('lid-worden/lid-worden', {
+        user: undefined,
+    });
+});
+
+router.post('/lid-worden/direct-debit/download', async (req, res) => {
+    const { fullName, iban, bic } = req.body;
+
+    try {
+        const updatedPdfBytes = await updatePdfFields({ fullName, iban, bic });
+
+        res.setHeader('Content-Disposition', 'attachment; filename=updated.pdf');
+        res.setHeader('Content-Type', 'application/pdf');
+        res.end(Buffer.from(updatedPdfBytes));
+    } catch (err) {
+        res.status(500).send('Error generating PDF: ' + err.message);
+    }
+});
+
+router.post('/lid-worden/personalia', (req, res) => {
+    let { email, studentNumber, gender, dateOfBirth, initials, firstName, lastNamePrefix, lastNameMain, phoneHome, address, zip, city, country, iban, bic } = req.body;
+
+    // Convert dateOfBirth to MySQL format
+    dateOfBirth = convertToMySQLDate(dateOfBirth);
+
+    // Check if email is already in use
+    connection.query('SELECT * FROM Members WHERE emailadres = ?', [email], (error, results) => {
+        if (error) {
+            console.error(error);
+            return res.status(500).send('Server error');
+        }
+
+        if (results.length) {
+            return res.json({ emailInUse: true });
+        }
+
+
+        // Generate a UUID in Node.js
+        const generatedUUID = uuidv4();
+
+        // Insert into address_info table first
+
+        connection.query('INSERT INTO address_info (id, street_address, postal_code, city, country_id) VALUES (?, ?, ?, ?, ?)', [generatedUUID, address, zip, city, country], (error) => {
+            if (error) {
+                console.error(error);
+                return res.status(500).send('Server error while inserting address');
+            }
+
+            // Now insert into Members table using the generatedUUID as address_id
+            connection.query('INSERT INTO Members (initials, first_name, primary_last_name_prefix, primary_last_name_main, geslacht, geboortedatum, emailadres, studentnummer, vaste_telefoon, address_id, iban, bic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [initials, firstName, lastNamePrefix, lastNameMain, gender, dateOfBirth, email, studentNumber, phoneHome, generatedUUID, iban, bic], (error) => {
+                if (error) {
+                    console.error(error);
+                    return res.status(500).send('Server error while inserting member');
+                }
+
+                res.json({ success: true });
+            });
+        });
+
+    });
 });
 
 

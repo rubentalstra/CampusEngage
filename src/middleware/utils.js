@@ -15,4 +15,9 @@ function userExists(req, res, next) {
     });
 }
 
-module.exports = { userExists };
+function convertToMySQLDate(inputDate) {
+    const [day, month, year] = inputDate.split('-');
+    return `${year}-${month}-${day}`;
+}
+
+module.exports = { userExists, convertToMySQLDate };
