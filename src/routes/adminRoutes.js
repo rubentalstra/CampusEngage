@@ -7,7 +7,7 @@ const { generateToken, genPassword } = require('../utilities/crypto');
 const { isAuth, ensureAuthenticatedAdmin, adminEnsure2fa } = require('../middleware/auth');
 
 const transporter = require('../utilities/mailer');
-const { getAdminDashboard } = require('../controller/adminController');
+const { getAdminDashboard, getMembersNotActive } = require('../controller/adminController');
 const { userExists } = require('../middleware/utils');
 const adminRouter = express.Router();
 
@@ -120,6 +120,11 @@ adminRouter.get('/admin-route', ensureAuthenticatedAdmin, adminEnsure2fa, (req, 
 adminRouter.get('/admin-dashboard', ensureAuthenticatedAdmin, adminEnsure2fa, getAdminDashboard);
 
 
+adminRouter.get('/administration/members', ensureAuthenticatedAdmin, adminEnsure2fa, getMembersNotActive);
+
+adminRouter.get('/managment/events', ensureAuthenticatedAdmin, adminEnsure2fa, (req, res) => {
+    res.render('admin/managment/events/index', { user: req.user });  // This should be a view where the user inputs their current 2FA code to remove it
+});
 
 
 // Endpoint for admin to send password setup email
@@ -139,7 +144,7 @@ adminRouter.post('/send-password-setup', (req, res) => {
         }
 
         // Fetch the user's email address
-        connection.query('SELECT emailadres FROM users WHERE id = ?', [userId], async function (error, results) {
+        connection.query('SELECT emailadres FROM Members WHERE id = ?', [userId], async function (error, results) {
             if (error || results.length === 0) {
                 console.error('Error fetching user email:', error);
                 return res.status(500).send('Error sending password setup email');

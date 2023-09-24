@@ -14,7 +14,7 @@ const customFields = {
 
 const verifyCallback = (emailadres, password, done) => {
 
-    connection.query('SELECT * FROM users WHERE emailadres = ? ', [emailadres], function (error, results, fields) {
+    connection.query('SELECT * FROM Members WHERE emailadres = ? ', [emailadres], function (error, results, fields) {
         if (error) {
             return done(error);
         }
@@ -43,7 +43,7 @@ passportUser.serializeUser((user, done) => {
 
 passportUser.deserializeUser(function (userId, done) {
     console.log('deserializeUser ' + userId);
-    connection.query('SELECT id, first_name, primary_last_name_main, emailadres, hasFA FROM users where id = ?', [userId], function (error, results) {
+    connection.query('SELECT id, first_name, primary_last_name_main, emailadres, hasFA FROM Members where id = ?', [userId], function (error, results) {
         if (error) { return console.log(error.sqlMessage); }
         if (results && results.length && results[0]) {
             done(null, results[0]);

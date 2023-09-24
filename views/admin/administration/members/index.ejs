@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('../../includes/meta'); %>
+
+
+  <title>AdminKit Demo - Bootstrap 5 Admin Template</title>
+
+  <link href="/css/app.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="wrapper">
+
+    <%- include('../../includes/sidebar'); %>
+
+    <div class="main">
+
+      <%- include('../../includes/navbar', {user: user}); %>
+
+
+      <main class="content">
+        <div class="container-fluid p-0">
+
+          <h1 class="h3 mb-3">Blank Page</h1>
+
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+
+                <div class="card-body">
+
+
+                  <table class="table table-hover my-0">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% users.forEach(user => { %>
+                      <tr>
+                        <td><%= user.id %></td>
+                        <td><%= user.first_name %> <%= user.primary_last_name_main %></td>
+                        <td><%= user.emailadres %></td>
+                        <td>
+                          <button onclick="sendEmail('<%= user.id %>')">Send Email</button>
+                        </td>
+                      </tr>
+                      <% }); %>
+                    </tbody>
+                  </table>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+
+      <%- include('../../includes/footer'); %>
+
+
+
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      let currentPath = window.location.pathname.split("/")[3]; // get the 3rd level of the path
+      let nav = document.querySelector(".sidebar");
+      let links = nav.querySelectorAll("a");
+
+      links.forEach(function(link) {
+        if (link.getAttribute("href").split("/")[3] === currentPath) {
+          link.parentElement.classList.add("active");
+        }
+      });
+    });
+
+
+    function sendEmail(userId) {
+      fetch('/admin/send-password-setup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: userId
+        })
+      }).then(res => {
+        if (res.ok) {
+          alert("Password setup email sent!");
+        } else {
+          alert("Failed to send email.");
+        }
+      });
+    }
+  </script>
+
+
+</body>
+
+</html>

@@ -88,7 +88,7 @@ router.post('/password/forgot', (req, res) => {
     const email = req.body.email;
 
     // Check if the user is active and fetch the email address
-    connection.query('SELECT first_name, emailadres, status FROM users WHERE emailadres = ?', [email], async function (error, results) {
+    connection.query('SELECT first_name, emailadres, status FROM Members WHERE emailadres = ?', [email], async function (error, results) {
         if (error || results.length === 0) {
             console.error('Error fetching user data:', error);
             return res.status(500).send('Error sending password setup email');

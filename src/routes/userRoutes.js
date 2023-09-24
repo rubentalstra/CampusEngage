@@ -35,7 +35,7 @@ userRouter.post('/set-password', (req, res) => {
     const token = req.body.token;
     const newPassword = req.body.password;
 
-    connection.query('SELECT * FROM users WHERE verification_token = ?', [token], function (error, results) {
+    connection.query('SELECT * FROM Members WHERE verification_token = ?', [token], function (error, results) {
         if (error) {
             console.error('Error retrieving user with token:', error);
             return res.status(500).send('Error setting password');
@@ -99,7 +99,7 @@ userRouter.get('/agenda', ensureAuthenticatedUser, userEnsure2fa, (req, res) => 
 userRouter.get('/profiel', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
     const userId = req.user.id;
 
-    connection.query('SELECT `imagePath` FROM `users` WHERE `id` = ?', [userId], function (error, results) {
+    connection.query('SELECT `imagePath` FROM `Members` WHERE `id` = ?', [userId], function (error, results) {
         if (error) {
             console.error(error);
             res.status(500).send('Server error');
@@ -135,7 +135,7 @@ userRouter.get('/view/:userId', ensureAuthenticatedUser, userEnsure2fa, (req, re
     const userId = req.params.userId;
 
     connection.query(
-        'SELECT `imagePath`, `publicImage` FROM `users` WHERE `id` = ?', [userId],
+        'SELECT `imagePath`, `publicImage` FROM `Members` WHERE `id` = ?', [userId],
         function (error, rows) {
             if (error) {
                 console.error(error);
@@ -171,7 +171,7 @@ userRouter.post('/delete/:userId', ensureAuthenticatedUser, userEnsure2fa, (req,
     }
 
     // Fetch imagePath from database to delete it from filesystem
-    connection.query('SELECT `imagePath` FROM `users` WHERE `id` = ?', [userId], (error, results) => {
+    connection.query('SELECT `imagePath` FROM `Members` WHERE `id` = ?', [userId], (error, results) => {
         if (error) {
             console.error(error);
             return res.status(500).send('Internal Server Error');
@@ -259,7 +259,7 @@ userRouter.get('/prompt-2fa', ensureAuthenticatedUser, (req, res, next) => {
 userRouter.post('/check-2fa', ensureAuthenticatedUser, (req, res) => {
     const token = req.body.token;
 
-    connection.query('SELECT twoFA_secret FROM users WHERE id = ?', [req.user.id], function (error, results) {
+    connection.query('SELECT twoFA_secret FROM Members WHERE id = ?', [req.user.id], function (error, results) {
         if (error || results.length === 0) {
             return res.status(500).send('Error fetching 2FA secret');
         }
@@ -283,7 +283,7 @@ userRouter.get('/remove-2fa', ensureAuthenticatedUser, (req, res) => {
 userRouter.post('/confirm-remove-2fa', ensureAuthenticatedUser, (req, res) => {
     const token = req.body.token;  // Get the 2FA token from the form
 
-    connection.query('SELECT twoFA_secret FROM users WHERE id = ?', [req.user.id], function (error, results) {
+    connection.query('SELECT twoFA_secret FROM Members WHERE id = ?', [req.user.id], function (error, results) {
         if (error || results.length === 0) {
             return res.status(500).send('Error fetching 2FA secret');
         }
