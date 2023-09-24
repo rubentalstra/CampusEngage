@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>RealTime - Setup 2FA</title>
+
+  <%- include('../../includes/meta', {}); %>
+
+  <%- include('../../includes/headLink', {}); %>
+
+  <style>
+    .content-header-background {
+      background-image: url('/img/banners/9094706bfd344c3cbbbffcc6d7fe3d0a-lg.png');
+    }
+  </style>
+</head>
+
+<body class="template-content webpage-5437 module-profile authenticated-user">
+
+  <%- include('../../includes/header', {user: user}); %>
+
+  <section id="content">
+    <div class="content-header content-header-background">
+      <div class="container">
+        <ol class="breadcrumb">
+          <li class="active">Setup Two-Factor Authentication</li>
+        </ol>
+        <h2>Setup Two-Factor Authentication</h2>
+      </div>
+    </div>
+    <div class="container text-center">
+      <div class="row">
+        <div class="paragraphs col-md-12">
+          <h2>Setup Two-Factor Authentication</h2>
+          <p class="lead">Scan the QR Code below using your 2FA application (e.g., Google Authenticator or Authy):</p>
+
+          <% if (qrCode) { %>
+          <div class="mt-4 mb-4">
+            <img src="<%= qrCode %>" alt="Scan this QR Code with your 2FA app">
+          </div>
+          <% } %>
+          <p>Or manually enter this secret code in your 2FA app: <strong><%= secret %></strong></p>
+
+          <form action="/mijn-realtime/verify-2fa" method="post">
+            <label for="token">Enter the token from your 2FA application:</label>
+            <input type="text" id="token" name="token" required>
+            <button class="btn btn-primary" type="submit">Verify & Set up 2FA</button>
+          </form>
+
+          <% if (typeof error !== 'undefined') { %>
+          <div class="alert alert-danger mt-3" role="alert">
+            <%= error %>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+
+
+
+  <%- include('../../includes/footer'); %>
+
+  <!-- generic javascript -->
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js" integrity="sha512-vO6PFSXNczuXHhdvGbOIXm67ZQlaRFjp4Wh+ARLfqPT1bVlmO1kyGrB1+7c2clk58XnsD/Cye9EJubT5B8BCgQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle2/20140216/jquery.cycle2.min.js" integrity="sha512-9pKhpjfZyETI7JvNCClrb4FN+nz9vPTvIRkIygeN5jRfMu4FQPTaePd3I2uLqOS6+hWjXJRwZHvUW+y9TUPJhw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- template javascript -->
+  <script src="/js/superfish-e25125463e3a68f85b0683f3bc21433b.js"></script>
+  <script src="/js/main-aac80d816f26db8660321cb022f841b1.js"></script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      let currentPath = window.location.pathname.split("/")[1]; // get the highest level of the path
+      let nav = document.querySelector(".header-nav");
+      let links = nav.querySelectorAll("a");
+
+      links.forEach(function(link) {
+        if (link.getAttribute("href").split("/")[1] === currentPath) {
+          link.parentElement.classList.add("path");
+        }
+      });
+    });
+  </script>
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>RealTime - Agenda</title>
+
+  <%- include('../includes/meta', {}); %>
+
+  <%- include('../includes/headLink', {}); %>
+
+  <style>
+    .content-header-background {
+      background-image: url('/img/banners/9094706bfd344c3cbbbffcc6d7fe3d0a-lg.png');
+    }
+  </style>
+</head>
+
+<body class="template-content webpage-5437 module-profile authenticated-user">
+
+  <%- include('../includes/header', {user: user}); %>
+
+
+
+
+  <section id="content">
+    <div class="content-header content-header-background">
+      <div class="container">
+        <ol class="breadcrumb">
+          <li><a href="/mijn-realtime">Mijn RealTime</a></li>
+          <li class="active">Agenda</li>
+        </ol>
+        <h2>Agenda</h2>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="aside col-md-3">
+          <ul id="submenu">
+            <li><a href="/mijn-realtime/profiel" title="">Profiel</a></li>
+            <li><a href="/mijn-realtime/groepen" title="">Groepen</a></li>
+            <li><a href="/mijn-realtime/smoelenboek" title="">Smoelenboek</a></li>
+            <li><a href="/mijn-realtime/merchandise" title="">Merchandise</a></li>
+            <li class="active"><a href="/mijn-realtime/agenda" title="">Agenda</a></li>
+            <li><a href="/mijn-realtime/uitschrijven" title="">Uitschrijven</a></li>
+          </ul>
+        </div>
+        <div class="paragraphs col-md-9">
+          <div class="row">
+            <div class=" col-md-6 paragraph-text paragraph-text-view">
+              <p>Vanaf heden is het mogelijk om alle&nbsp;evenementen van&nbsp;Real<em>Time&nbsp;</em>in je Google Agenda te plaatsen! Klik hiernaast op 'Toevoegen aan Google Agenda' of stuur een e-mail naar <a data-cke-saved-href="mailto:agenda@sv-realtime.nl?subject=Agendaverzoek" href="mailto:agenda@sv-realtime.nl?subject=Agendaverzoek">agenda@sv-realtime.nl</a> om een URL te ontvangen met de agendagegevens.</p>
+            </div>
+            <div class=" col-md-6 paragraph-html paragraph-html-view">
+              <iframe src="https://calendar.google.com/calendar/embed?showTitle=0&amp;showNav=0&amp;showPrint=0&amp;showTabs=0&amp;showCalendars=0&amp;showTz=0&amp;mode=AGENDA&amp;height=300&amp;wkst=2&amp;hl=en_GB&amp;bgcolor=%23FFFFFF&amp;src=sv-realtime.nl_pqgiatt5gb10ujmfbku8avta48@group.calendar.google.com&amp;color=%23B1365F&amp;ctz=Europe%2FAmsterdam" style="border-width:0" width="400" height="300" frameborder="0" scrolling="no"></iframe>
+            </div>
+          </div>
+        </div>
+
+        <%- include('../includes/partners.ejs'); %>
+
+      </div>
+    </div>
+  </section>
+
+
+
+
+
+  <%- include('../includes/footer'); %>
+
+  <!-- generic javascript -->
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js" integrity="sha512-vO6PFSXNczuXHhdvGbOIXm67ZQlaRFjp4Wh+ARLfqPT1bVlmO1kyGrB1+7c2clk58XnsD/Cye9EJubT5B8BCgQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle2/20140216/jquery.cycle2.min.js" integrity="sha512-9pKhpjfZyETI7JvNCClrb4FN+nz9vPTvIRkIygeN5jRfMu4FQPTaePd3I2uLqOS6+hWjXJRwZHvUW+y9TUPJhw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- template javascript -->
+  <script src="/js/superfish-e25125463e3a68f85b0683f3bc21433b.js"></script>
+  <script src="/js/main-aac80d816f26db8660321cb022f841b1.js"></script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      let currentPath = window.location.pathname.split("/")[1]; // get the highest level of the path
+      let nav = document.querySelector(".header-nav");
+      let links = nav.querySelectorAll("a");
+
+      links.forEach(function(link) {
+        if (link.getAttribute("href").split("/")[1] === currentPath) {
+          link.parentElement.classList.add("path");
+        }
+      });
+    });
+  </script>
+
+
+
+
+</body>
+
+</html>

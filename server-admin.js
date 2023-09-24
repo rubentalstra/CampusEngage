@@ -7,7 +7,10 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passportUser = require('./src/config/passportUsers');
-const router = require('./src/routes/mainRoutes');
+const passportAdmins = require('./src/config/passportAdmins');
+const { validPassword } = require('./src/utilities/crypto');
+const adminRouter = require('./src/routes/adminRoutes');
+
 const MySQLStore = require('express-mysql-session')(session);
 
 
@@ -52,9 +55,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Initialize Passport and session
 // Separate session and passport middleware for Users
 app.use(session({
-    name: 'userSession',
-    key: process.env.USER_SESSION_KEY,
-    secret: process.env.USER_SESSION_SECRET,
+    name: 'adminSession',
+    key: process.env.ADMIN_SESSION_KEY,
+    secret: process.env.ADMIN_SESSION_SECRET,
     store: new MySQLStore({
         host: process.env.MYSQL_SERVER,
         port: process.env.MYSQL_PORT,
@@ -69,8 +72,9 @@ app.use(session({
         maxAge: 1000 * 60 * 60
     }
 }));
-app.use(passportUser.initialize());
-app.use(passportUser.session());
+app.use(passportAdmins.initialize());
+app.use(passportAdmins.session());
+
 
 
 
@@ -85,10 +89,7 @@ const limiter = rateLimit({
 
 // Apply the rate limiting middleware to all requests
 app.use(limiter);
-
-// Use the mainRoutes for handling routes
-app.use('/', router);
-// app.use('/admin', adminRouter);
+app.use('/admin', adminRouter);
 
 // HTTPS server setup
 const options = {
@@ -97,6 +98,6 @@ const options = {
 };
 
 const server = https.createServer(options, app);
-server.listen(process.env.PORT, () => {
-    console.log(`App listening on port ${process.env.PORT}!`);
+server.listen(8444, () => {
+    console.log(`App listening on port 8444!`);
 });

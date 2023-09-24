@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>RealTime - Profiel</title>
+
+  <%- include('../includes/meta', {}); %>
+
+  <%- include('../includes/headLink', {}); %>
+
+  <style>
+    .content-header-background {
+      background-image: url('/img/banners/9094706bfd344c3cbbbffcc6d7fe3d0a-lg.png');
+    }
+  </style>
+</head>
+
+<body class="template-content webpage-5437 module-profile authenticated-user">
+
+  <%- include('../includes/header', {user: user}); %>
+
+  <section id="content">
+    <div class="content-header content-header-background">
+      <div class="container">
+        <ol class="breadcrumb">
+          <li>
+            <a href="/mijn-realtime">Mijn RealTime</a>
+          </li>
+          <li class="active">Profiel</li>
+        </ol>
+        <h2>Profiel</h2>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="aside col-md-3">
+          <ul id="submenu">
+            <li class="active">
+              <a href="/mijn-realtime/profiel" title="">Profiel</a>
+              <ul>
+                <li>
+                  <a href="/mijn-realtime/profiel/2fa" title="">2FA Settings</a>
+                <li>
+                <li>
+                  <a href="/mijn-realtime/profiel/groepen" title="">Mijn groepen</a>
+                <li>
+                  <a href="/mijn-realtime/profiel/evenementen" title="">Mijn evenementen</a>
+                <li>
+                  <a href="/mijn-realtime/profiel/facturen" title="">Mijn facturen</a>
+              </ul>
+            </li>
+            <li>
+              <a href="/mijn-realtime/groepen" title="">Groepen</a>
+            </li>
+            <li>
+              <a href="/mijn-realtime/smoelenboek" title="">Smoelenboek</a>
+            </li>
+            <li>
+              <a href="/mijn-realtime/merchandise" title="">Merchandise</a>
+            </li>
+            <li>
+              <a href="/mijn-realtime/agenda" title="">Agenda</a>
+            </li>
+            <li>
+              <a href="/mijn-realtime/uitschrijven" title="">Uitschrijven</a>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraphs col-md-9">
+          <div class="row">
+            <div class=" col-md-12 paragraph-text">
+
+
+              <div class="headline">
+                <h4>R.D. (Ruben Daniël) Talstra</h4>
+              </div>
+              <ul class="nav nav-tabs">
+                <li class="active">
+                  <a href="#personalia" data-toggle="tab">Personalia</a>
+                </li>
+                <li>
+                  <a href="#preferences" data-toggle="tab">Voorkeuren</a>
+                </li>
+                <li>
+                  <a href="#membership" data-toggle="tab">Lidmaatschap</a>
+                </li>
+              </ul>
+
+              <div class="tab-content">
+                <div class="tab-pane active" id="personalia">
+
+
+
+
+
+                  <div class="profile-picture pull-right">
+
+                    <!-- Image or Placeholder -->
+                    <% if (imagePath) { %>
+                    <div>
+                      <img src="/mijn-realtime/view/<%= user.id %>" alt="Profile Picture" width="200">
+
+                      <form action="/mijn-realtime/delete/<%= user.id %>" method="post">
+                        <button type="submit">Delete</button>
+                      </form>
+                    </div>
+                    <% } else { %>
+                    <div class="img-rounded">
+                      <i class="fa fa-user"></i>
+                      <div>Geen Profielfoto</div>
+                    </div>
+                    <% } %>
+
+                  </div>
+
+
+
+
+
+                  <fieldset>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Geslacht</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">Man</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Geboortedatum</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">12 nov. 2001</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Naam</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">R.D. (Ruben Daniël) Talstra</p>
+                      </div>
+                    </div>
+
+                    <% if (!imagePath) { %>
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Upload Image</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <form action="/mijn-realtime/upload" method="post" enctype="multipart/form-data">
+                          <input type="file" name="profilePic" required>
+
+                          <label>
+                            Public:
+                            <input type="checkbox" name="public" value="true">
+                          </label>
+                          <br>
+                          <input type="hidden" name="userId" value="<%= user.id %>">
+                          <button type="submit">Upload</button>
+                        </form>
+                      </div>
+                    </div>
+                    <% } %>
+
+
+                    <p>&nbsp;</p>
+                  </fieldset>
+                  <fieldset>
+                    <legend>Contactgegevens</legend>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>E-mailadres</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">
+                          <a href="mailto:r.d.talstra@st.hanze.nl">r.d.talstra@st.hanze.nl</a>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Mobiele telefoon</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">+31 6 11 21 27 74</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Vaste telefoon</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">-</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Adres</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">
+                          Het Blauwgras 23
+                          <br />
+                          9203 HJ Drachten
+                          <br />
+                          Nederland
+                        </p>
+                      </div>
+                    </div>
+                  </fieldset>
+                  <fieldset>
+                    <legend>Bankrekening</legend>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>IBAN</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">NL57 ING B ** ** * **</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>BIC</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">INGBNL2A</p>
+                      </div>
+                    </div>
+                  </fieldset>
+                  <fieldset>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Automatische incasso</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">Je hebt een SEPA machtiging getekend op 3 sep. 2023, met referentie 20230903810810.</p>
+                      </div>
+                    </div>
+                  </fieldset>
+
+                </div>
+
+                <div class="tab-pane" id="preferences">
+                  <fieldset>
+                    <legend>Almanak</legend>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Toon in Almanak</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">Je profiel kan gevonden worden in Almanak</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Toon adresgegevens</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">Nee</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Toon telefoonnummer(s)</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">Nee</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Toon e-mailadres</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">Nee</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Toon geboortedatum</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">Nee</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Toon overige informatie</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">Nee</p>
+                      </div>
+                    </div>
+                  </fieldset>
+                  <fieldset>
+                    <legend>Communicatie</legend>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Ontvang mailings</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">Nee</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Ontvang SMSjes</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">Nee</p>
+                      </div>
+                    </div>
+                  </fieldset>
+                  <fieldset>
+                    <legend>Notificaties</legend>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Evenementen</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">
+                          Je ontvangt
+                          <strong>geen</strong>
+                          e-mail wanneer je inschrijving voor een evenement wijzigt
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Reacties</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">
+                          Je ontvangt
+                          <strong>geen</strong>
+                          e-mail wanneer iemand reageert op je reactie
+                        </p>
+                      </div>
+                    </div>
+                  </fieldset>
+                  <fieldset>
+                    <legend>Privacy</legend>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Taggen</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">Nee</p>
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <div class="tab-pane" id="membership">
+                  <fieldset>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Studentnummer</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">469048</p>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
+                        <span>Lid sinds</span>
+                      </label>
+                      <div class="col-sm-7">
+                        <p class="form-control-static">11 jul. 2023</p>
+                      </div>
+                    </div>
+
+                  </fieldset>
+                  <fieldset>
+                    <legend>Voorwaarden voor het gebruik van online diensten</legend>
+                    <p>
+                      Je bent akkoord gegaan met de
+                      <a href="/mijn-realtime/profiel/voorwaarden">voorwaarden voor het gebruik van online diensten</a>
+                      op 4 sep. 2023 15:23:49
+                    </p>
+                  </fieldset>
+                </div>
+              </div>
+
+              <a class="btn btn-active btn-primary edit-profile" href="/mijn-realtime/profiel/edit">
+                <i class="fa fa-fw fa-pencil"></i>
+                Profiel bewerken
+              </a>
+
+              <a class="btn btn-default" href="/mijn-realtime/profiel/change_password">
+                <i class="fa fa-fw fa-lock"></i>
+                Wijzig wachtwoord
+              </a>
+
+            </div>
+          </div>
+        </div>
+
+
+        <%- include('../includes/partners.ejs'); %>
+
+
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <%- include('../includes/footer'); %>
+
+  <!-- generic javascript -->
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js" integrity="sha512-vO6PFSXNczuXHhdvGbOIXm67ZQlaRFjp4Wh+ARLfqPT1bVlmO1kyGrB1+7c2clk58XnsD/Cye9EJubT5B8BCgQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle2/20140216/jquery.cycle2.min.js" integrity="sha512-9pKhpjfZyETI7JvNCClrb4FN+nz9vPTvIRkIygeN5jRfMu4FQPTaePd3I2uLqOS6+hWjXJRwZHvUW+y9TUPJhw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- template javascript -->
+  <script src="/js/superfish-e25125463e3a68f85b0683f3bc21433b.js"></script>
+  <script src="/js/main-aac80d816f26db8660321cb022f841b1.js"></script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      let currentPath = window.location.pathname.split("/")[1]; // get the highest level of the path
+      let nav = document.querySelector(".header-nav");
+      let links = nav.querySelectorAll("a");
+
+      links.forEach(function(link) {
+        if (link.getAttribute("href").split("/")[1] === currentPath) {
+          link.parentElement.classList.add("path");
+        }
+      });
+    });
+  </script>
+
+
+
+
+</body>
+
+</html>

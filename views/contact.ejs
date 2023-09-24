@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>RealTime - Contact</title>
+
+  <%- include('includes/meta', {}); %>
+
+  <%- include('includes/headLink', {}); %>
+
+  <style>
+    .content-header-background {
+      background-image: url('/img/banners/9094706bfd344c3cbbbffcc6d7fe3d0a-lg.png');
+    }
+  </style>
+</head>
+
+<body class="template-content webpage-5437 module-profile authenticated-user">
+
+  <%- include('includes/header', {user: user}); %>
+
+  <section id="content">
+    <div class="content-header content-header-background">
+      <div class="container">
+        <ol class="breadcrumb">
+          <li class="active">Contact</li>
+        </ol>
+        <h2>Contact</h2>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="paragraphs col-md-12">
+          <div class="row">
+            <div class=" col-md-6 paragraph-html paragraph-html-view">
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2387.7817515106226!2d6.53577860534502!3d53.23968849782885!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x6b2ed4ca200ecad9!2sS.V.+RealTime!5e0!3m2!1snl!2snl!4v1477148702453" width="550" height="600" frameborder="0" style="border:0" allowfullscreen=""></iframe>
+            </div>
+            <div class=" col-md-6 paragraph-text paragraph-text-view">
+              <p>Voor een vrijblijvend gesprek over een partnerschap of een samenwerking kunt u contact opnemen met de extern coördinator Giovanni Aramu, via extern@sv-realtime.nl. Voor algemene zaken kunt u contact opnemen met de bestuurssecretaris Herman Doze, via bestuur@sv-realtime.nl.</p>
+              <p><strong>Studievereniging Real<em>Time</em></strong><br>Kamer ZP11/A245&nbsp;<br>Zernikeplein 11&nbsp;<br>​9747 AS Groningen</p>
+              <p>+31 50 595 48 92&nbsp;<br>bestuur@sv-realtime.nl<br><br><strong>IBAN</strong><br>NL71ABNA0504686208<br><br><strong>KVK</strong><br>02068054​<br><br><strong>Dany de Wind, voorzitter</strong><br>voorzitter@sv-realtime.nl<br><br><strong>Herman Doze, secretaris</strong><br>secretaris@sv-realtime.nl<br><br><strong>Sam Dorreboom, penningmeester</strong><br>penningmeester@sv-realtime.nl<br><br><strong>Herman Doze, intern coördinator</strong><br><strong>​</strong>intern@sv-realtime.nl<br><br><strong>Giovanni Aramu, extern coördinator</strong><br><strong>​</strong>extern@sv-realtime.nl</p>
+            </div>
+          </div>
+        </div>
+
+        <%- include('includes/partners.ejs'); %>
+
+
+      </div>
+    </div>
+  </section>
+
+
+
+  <%- include('includes/footer'); %>
+
+  <!-- generic javascript -->
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js" integrity="sha512-vO6PFSXNczuXHhdvGbOIXm67ZQlaRFjp4Wh+ARLfqPT1bVlmO1kyGrB1+7c2clk58XnsD/Cye9EJubT5B8BCgQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle2/20140216/jquery.cycle2.min.js" integrity="sha512-9pKhpjfZyETI7JvNCClrb4FN+nz9vPTvIRkIygeN5jRfMu4FQPTaePd3I2uLqOS6+hWjXJRwZHvUW+y9TUPJhw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- template javascript -->
+  <script src="/js/superfish-e25125463e3a68f85b0683f3bc21433b.js"></script>
+  <script src="/js/main-aac80d816f26db8660321cb022f841b1.js"></script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      let currentPath = window.location.pathname.split("/")[1]; // get the highest level of the path
+      let nav = document.querySelector(".header-nav");
+      let links = nav.querySelectorAll("a");
+
+      links.forEach(function(link) {
+        if (link.getAttribute("href").split("/")[1] === currentPath) {
+          link.parentElement.classList.add("path");
+        }
+      });
+    });
+  </script>
+
+
+
+
+</body>
+
+</html>

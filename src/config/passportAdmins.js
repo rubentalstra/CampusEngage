@@ -1,9 +1,11 @@
 delete require.cache[require.resolve('passport')];
-const passportAdmins = require('passport');
+const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const connection = require('./database');
 const { validPassword } = require('../utilities/crypto');
 
+
+const passportAdmin = new passport.Passport();
 
 const customFields = {
     usernameField: 'uname',
@@ -32,14 +34,14 @@ const verifyCallback = (username, password, done) => {
 };
 
 const strategy = new LocalStrategy(customFields, verifyCallback);
-passportAdmins.use('admin', strategy);
+passportAdmin.use('local-admin', strategy);
 
-passportAdmins.serializeUser((admin, done) => {
+passportAdmin.serializeUser((user, done) => {
     console.log('inside serialize');
-    done(null, admin.id);
+    done(null, user.id);
 });
 
-passportAdmins.deserializeUser(function (adminId, done) {
+passportAdmin.deserializeUser(function (adminId, done) {
     console.log('deserializeUser ' + adminId);
     connection.query('SELECT id, username,  isAdmin, hasFA FROM admins where id = ?', [adminId], function (error, results) {
         if (error) { return console.log(error.sqlMessage); }
@@ -49,4 +51,4 @@ passportAdmins.deserializeUser(function (adminId, done) {
     });
 });
 
-module.exports = passportAdmins;
+module.exports = passportAdmin;

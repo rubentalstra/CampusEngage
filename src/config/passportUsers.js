@@ -4,8 +4,11 @@ const connection = require('./database');
 const { validPassword } = require('../utilities/crypto');
 
 
+
+const passportUser = new passport.Passport();
+
 const customFields = {
-    usernameField: 'uname',
+    usernameField: 'email',
     passwordField: 'pw',
 };
 
@@ -31,16 +34,16 @@ const verifyCallback = (emailadres, password, done) => {
 };
 
 const strategy = new LocalStrategy(customFields, verifyCallback);
-passport.use(strategy);
+passportUser.use('local-user', strategy);
 
-passport.serializeUser((user, done) => {
+passportUser.serializeUser((user, done) => {
     console.log('inside serialize');
     done(null, user.id);
 });
 
-passport.deserializeUser(function (userId, done) {
+passportUser.deserializeUser(function (userId, done) {
     console.log('deserializeUser ' + userId);
-    connection.query('SELECT id, emailadres, hasFA FROM users where id = ?', [userId], function (error, results) {
+    connection.query('SELECT id, first_name, primary_last_name_main, emailadres, hasFA FROM users where id = ?', [userId], function (error, results) {
         if (error) { return console.log(error.sqlMessage); }
         if (results && results.length && results[0]) {
             done(null, results[0]);
@@ -48,4 +51,4 @@ passport.deserializeUser(function (userId, done) {
     });
 });
 
-module.exports = passport;
+module.exports = passportUser;

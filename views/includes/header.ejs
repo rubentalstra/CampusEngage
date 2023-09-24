@@ -1,0 +1,367 @@
+<header>
+  <div class="container">
+    <div class="header-nav-top">
+
+      <div class="row">
+        <div class="col-xs-12 text-right">
+          <div class="login">
+            <p>
+              <% if ( user != undefined) { %>
+              <a href="/mijn-realtime/profiel"><%= user.first_name %> <%= user.primary_last_name_main %></a> | <a href="/logout">Uitloggen</a>
+              <% } else { %>
+              <a href="/login">Inloggen</a>
+              <% } %>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-nav">
+      <div class="header-logo navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <i class="fa fa-bars"></i>
+        </button>
+        <a href="/" class="navbar-brand">
+          <h1 class="text-hide">RealTime</h1>
+        </a>
+      </div>
+      <nav role="menu" class="header-menu navbar-collapse collapse navbar-responsive-collapse">
+        <ul id="menu" class="sf-menu">
+          <li>
+            <a href="/over-realtime" title="" target="_self">Over RealTime</a>
+            <ul>
+              <li>
+                <a href="/over-realtime/nieuws" title="" target="_self">Nieuws</a>
+              </li>
+              <li>
+                <a href="/over-realtime/social-media" title="" target="_self">Social Media</a>
+                <ul>
+                  <li>
+                    <a href="https://discord.com/invite/s2FaQSq" title="" target="_blank">Discord</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/social-media/whatsapp" title="" target="_self">WhatsApp</a>
+                    <ul>
+                      <li>
+                        <a href="https://chat.whatsapp.com/IdsXOUPYpBn7MbTN3QWNrV" title="" target="_blank">Nieuws &amp; Notificaties</a>
+                      </li>
+                      <li>
+                        <a href="https://chat.whatsapp.com/K4yMDNRYW7bB1mCAwn2FF5" title="" target="_blank">RealTime</a>
+                      </li>
+                      <li>
+                        <a href="https://chat.whatsapp.com/4A2WYvNooWS1LuBTCHwVBw" title="" target="_blank">RealQuotes</a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <a href="https://www.instagram.com/svrealtime/" title="" target="_blank">Instagram</a>
+                  </li>
+                  <li>
+                    <a href="https://www.facebook.com/svrealtime" title="" target="_blank">Facebook</a>
+                  </li>
+                  <li>
+                    <a href="https://twitter.com/svrealtime" title="" target="_blank">Twitter</a>
+                  </li>
+                  <li>
+                    <a href="https://signal.group/#CjQKIC2Fe_i63MfrpXfaPjVY6rl2jLKzhDCsA4SoJvMaQqhvEhBbkgK7VsT2sjhKx416FRw4" title="" target="_blank">Signal</a>
+                  </li>
+                  <li>
+                    <a href="https://www.linkedin.com/company/realtime-studievereniging/" title="" target="_blank">LinkedIn</a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href="/over-realtime/bestuur" title="" target="_self">Bestuur</a>
+                <ul>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2022-2023" title="" target="_self">Bestuur 2022 - 2023</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2021-2022" title="" target="_self">Bestuur 2021 -2022</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2020-2021" title="" target="_self">Bestuur 2020 - 2021</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2019-2020" title="" target="_self">Bestuur 2019 - 2020</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2018-2019" title="" target="_self">Bestuur 2018 - 2019</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2017-2018" title="" target="_self">Bestuur 2017 - 2018</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2016-2017" title="" target="_self">Bestuur 2016 - 2017</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2015-2016" title="" target="_self">Bestuur 2015 - 2016</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2014-2015" title="" target="_self">Bestuur 2014 - 2015</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2013-2014" title="" target="_self">Bestuur 2013 - 2014</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2012-2013" title="" target="_self">Bestuur 2012 - 2013</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2011-2012" title="" target="_self">Bestuur 2011 - 2012</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2010-2011" title="" target="_self">Bestuur 2010 - 2011</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2009-2010" title="" target="_self">Bestuur 2009 - 2010</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2008-2009" title="" target="_self">Bestuur 2008 - 2009</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2007-2008" title="" target="_self">Bestuur 2007 - 2008</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2006-2007" title="" target="_self">Bestuur 2006 - 2007</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2005-2006" title="" target="_self">Bestuur 2005 - 2006</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2004-2005" title="" target="_self">Bestuur 2004 - 2005</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2003-2004" title="" target="_self">Bestuur 2003 - 2004</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2002-2003" title="" target="_self">Bestuur 2002 - 2003</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2001-2002" title="" target="_self">Bestuur 2001 - 2002</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/bestuur-2000-2001" title="" target="_self">Bestuur 2000 - 2001</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/bestuur/oprichtingsbestuur" title="" target="_self">Oprichtingsbestuur</a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href="https://www.sv-realtime.nl/over-realtime/commissies/word-commissielid" title="" target="_self">Commissies</a>
+                <ul>
+                  <li>
+                    <a href="/over-realtime/commissies/word-commissielid" title="" target="_self">Word commissielid!</a>
+                  </li>
+                  <li>
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLScvwn4xliHwbdXILJzkUw-XJvhZC6I74mcaDkSCAjm_qxw-og/viewform?usp=sf_link" title="" target="_blank">Commissiewerk</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/commissies/activiteitencommissie" title="" target="_self">Activiteitencommissie</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/commissies/reiscommissie" title="" target="_self">Reiscommissie</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/commissies/introductiecommissie" title="" target="_self">Introductiecommissie</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/commissies/lan-commissie" title="" target="_self">LAN-commissie</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/commissies/ledenweekendcommissie" title="" target="_self">Ledenweekendcommissie</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/commissies/almanakcommissie" title="" target="_self">Almanakcommissie</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/commissies/promotiecommissie" title="" target="_self">Promotiecommissie</a>
+                  </li>
+                  <li>
+                    <a href="/over-realtime/commissies/studiecommissie" title="" target="_self">Studiecommissie</a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href="/over-realtime/kascommissie" title="" target="_self">Kascommissie</a>
+              </li>
+              <li>
+                <a href="/over-realtime/raad-van-advies" title="" target="_self">Raad van Advies</a>
+              </li>
+              <li>
+                <a href="/over-realtime/ereleden" title="" target="_self">Ereleden</a>
+              </li>
+              <li>
+                <a href="/over-realtime/geschiedenis" title="" target="_self">Geschiedenis</a>
+              </li>
+              <li>
+                <a href="/over-realtime/reglementen" title="" target="_self">Reglementen</a>
+              </li>
+              <li>
+                <a href="/over-realtime/algemene-ledenvergadering" title="" target="_self">Algemene ledenvergadering</a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a href="/hbo-ict" title="" target="_self">HBO-ICT</a>
+            <ul>
+              <li>
+                <a href="/hbo-ict/snelkoppelingen" title="" target="_self">Snelkoppelingen</a>
+                <ul>
+                  <li>
+                    <a href="https://www.hanze.nl" title="" target="_blank">Hanze.nl</a>
+                  </li>
+                  <li>
+                    <a href="https://osiris.hanze.nl" title="" target="_blank">Osiris</a>
+                  </li>
+                  <li>
+                    <a href="https://blackboard.hanze.nl" title="" target="_blank">Blackboard</a>
+                  </li>
+                  <li>
+                    <a href="https://digirooster.hanze.nl/" title="" target="_blank">Digirooster</a>
+                  </li>
+                  <li>
+                    <a href="https://www.hanze.nl/webmail" title="" target="_blank">Webmail</a>
+                  </li>
+                  <li>
+                    <a href="https://wrb.hanze.nl/" title="" target="_blank">Webroombooking</a>
+                  </li>
+                  <li>
+                    <a href="https://www.hanze.nl/onstage" title="" target="_blank">OnStage</a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href="/hbo-ict/study-support" title="" target="_self">Study Support</a>
+              </li>
+              <li>
+                <a href="/hbo-ict/tentamenrooster" title="" target="_self">Tentamenrooster</a>
+              </li>
+              <li>
+                <a href="/hbo-ict/oer" title="" target="_self">OER</a>
+              </li>
+              <li>
+                <a href="https://www.mijnhanze.nl/knowledgebase-student/onderwerpen/wet-en-regelgeving/studentenstatuut/studentenstatuut" title="" target="_blank">Studentenstatuut</a>
+              </li>
+              <li>
+                <a href="https://www.hanze.nl/nl/over-hanze/faciliteiten-en-voorzieningen" title="" target="_blank">Decanaat</a>
+              </li>
+              <li>
+                <a href="https://www.hanze.nl/nld/organisatie/stafbureau/informatisering/support/snel-naar/office-365" title="" target="_blank">Microsoft Office</a>
+              </li>
+              <li>
+                <a href="https://e5.onthehub.com/WebStore/Welcome.aspx?vsro=8&amp;ws=D9709666-A88B-E011-969D-0030487D8897" title="" target="_blank">Microsoft Imagine</a>
+              </li>
+              <li>
+                <a href="https://catalogue.hanze.nl/nl/Programme/2019/ECTSITVBITM19" title="" target="_blank">Opleidingsinformatie BITM</a>
+              </li>
+              <li>
+                <a href="https://catalogue.hanze.nl/nl/Programme/2019/ECTSITVNSE19" title="" target="_blank">Opleidingsinformatie NSE</a>
+              </li>
+              <li>
+                <a href="https://catalogue.hanze.nl/nl/Programme/2019/ECTSITVSE19" title="" target="_blank">Opleidingsinformatie SE</a>
+              </li>
+              <li>
+                <a href="/hbo-ict/informatie" title="" target="_self">Informatie</a>
+                <ul>
+                  <li>
+                    <a href="/hbo-ict/informatie/opleidingscommissie" title="" target="_self">Opleidingscommissie</a>
+                  </li>
+                  <li>
+                    <a href="/hbo-ict/informatie/imr" title="" target="_self">IMR</a>
+                  </li>
+                  <li>
+                    <a href="/hbo-ict/informatie/majors" title="" target="_self">Majors</a>
+                  </li>
+                  <li>
+                    <a href="/hbo-ict/informatie/vervolgopleidingen" title="" target="_self">Vervolgopleidingen</a>
+                  </li>
+                  <li>
+                    <a href="https://www.hanze.nl/nld/organisatie/hanzehogeschool/medezeggenschap" title="" target="_blank">Medezeggenschap</a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href="/hbo-ict/tools" title="" target="_self">Tools</a>
+                <ul>
+                  <li>
+                    <a href="https://education.github.com/" title="" target="_blank">GitHub</a>
+                  </li>
+                  <li>
+                    <a href="https://www.jetbrains.com/student/" title="" target="_blank">JetBrains</a>
+                  </li>
+                  <li>
+                    <a href="https://www.linkedin.com/learning/" title="" target="_blank">Linkdin learning</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a href="/carriere" title="" target="_self">Carrière</a>
+            <ul>
+              <li>
+                <a href="/carriere/partners" title="" target="_self">Partners</a>
+              </li>
+              <li>
+                <a href="/carriere/vacatures-en-stages" title="" target="_self">Vacatures en stages</a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a href="/evenementen" title="" target="_self">Evenementen</a>
+          </li>
+          <li>
+            <a href="/fotos" title="" target="_self">Foto&#39;s</a>
+          </li>
+          <li>
+            <a href="/mijn-realtime" title="" target="_self">Mijn RealTime</a>
+            <ul>
+              <li>
+                <a href="/mijn-realtime/profiel" title="" target="_self">Profiel</a>
+              </li>
+              <li>
+                <a href="/mijn-realtime/groepen" title="" target="_self">Groepen</a>
+              </li>
+              <li>
+                <a href="/mijn-realtime/smoelenboek" title="" target="_self">Smoelenboek</a>
+              </li>
+              <li>
+                <a href="/mijn-realtime/merchandise" title="" target="_self">Merchandise</a>
+              </li>
+              <li>
+                <a href="/mijn-realtime/agenda" title="" target="_self">Agenda</a>
+              </li>
+              <li>
+                <a href="/mijn-realtime/uitschrijven" title="" target="_self">Uitschrijven</a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a href="/contact" title="" target="_self">Contact</a>
+          </li>
+          <% if (!user) { %>
+          <li>
+            <a href="/lid-worden" title="" target="_self">Lid worden</a>
+          </li>
+          <% } %>
+        </ul>
+
+        <div class="top-mobile">
+
+          <div class="login">
+            <p>
+              <% if ( user != undefined) { %>
+              <a href="/mijn-realtime/profiel"><%= user.first_name %> <%= user.primary_last_name_main %></a> | <a href="/logout">Uitloggen</a>
+              <% } else { %>
+              <a href="/login">Inloggen</a>
+              <% } %>
+            </p>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>

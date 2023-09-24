@@ -12,143 +12,23 @@ const upload = require('../utilities/uploadImage');
 
 const userRouter = express.Router();
 
-// const { ensureAuthenticatedUser, userEnsure2fa, isAdmin } = require('../middleware/auth');
-// const { userExists } = require('../middleware/utils');
-// const { Totp } = require('time2fa');
-// const qrcode = require('qrcode');
-// const passport = require('../config/passport');
-// const connection = require('../config/database');
-// const { genPassword } = require('../utilities/crypto');
-// const { getHomePage } = require('../controller/mainController');
-// const path = require('path');
-// const fs = require('fs');
-// const upload = require('../utilities/uploadImage');
 
 
-
-userRouter.use((req, res, next) => {
-    if (!req.session.userAgent) {
-        req.session.userAgent = req.headers['user-agent'];
-    }
-
-    if (req.session.userAgent !== req.headers['user-agent']) {
-        // Possible session hijacking, take appropriate action
-        req.logout(function (err) {
-            if (err) { return next(err); }
-            req.session.destroy(function (err) {
-                if (err) { return next(err); }
-                res.redirect('/session-hijacking');
-            });
-            return;  // This is crucial, as you don't want any code after this block to run if a session is hijacked
-        });
-    } else {
-        console.log(req.session);
-        console.log(req.user);
-        req.session.userType = 'user';
-        next(); // Proceed to the next middleware or route handler
-    }
-});
 
 userRouter.get('/user-dashboard', ensureAuthenticatedUser, userEnsure2fa, (req, res, next) => {
-    res.render('user/user-dashboard', { user: req.user });
-});
-
-userRouter.get('/login', (req, res, next) => {
-    res.render('user/login');
-});
-
-// Adjusting the login success route:
-userRouter.post('/login', passportUser.authenticate('local', {
-    failureRedirect: '/user/login-failure',
-    successRedirect: '/user/prompt-2fa'
-}), (req, res, next) => {
-    req.session.regenerate(function (err) {
-        // will have a new session here
-        res.redirect('/user/prompt-2fa');
-    });
+    res.render('mijn-realtime/user-dashboard', { user: req.user });
 });
 
 
-
-userRouter.get('/login-failure', (req, res, next) => {
-    res.send('You entered the wrong password.');
-});
-
-// Logout redirection adjustment:
-userRouter.get('/logout', (req, res, next) => {
-    req.logout(function (err) {
-        if (err) { return next(err); }
-        res.redirect('/');
-    });
-});
-
-
-userRouter.get('/register', (req, res, next) => {
-    console.log('Inside get');
-    res.render('user/register');
-
-});
-
-
-userRouter.post('/register', (req, res) => {
-    const {
-        type_name,
-        first_name,
-        initials,
-        primary_last_name_prefix,
-        primary_last_name_main,
-        geslacht,
-        geboortedatum,
-        emailadres,
-        mobiele_telefoon,
-        vaste_telefoon,
-        iban,
-        bic,
-        sepa_machtiging_date,
-        sepa_referentie,
-        studentnummer
-    } = req.body;
-
-    const now = new Date();
-
-    connection.query('INSERT INTO users(type_name, status, first_name, initials, primary_last_name_prefix, primary_last_name_main, geslacht, geboortedatum, emailadres, mobiele_telefoon, vaste_telefoon, iban, bic, sepa_machtiging_date, sepa_referentie, studentnummer, lid_sinds) VALUES (?, "pending", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-        type_name,
-        first_name,
-        initials,
-        primary_last_name_prefix,
-        primary_last_name_main,
-        geslacht,
-        geboortedatum,
-        emailadres,
-        mobiele_telefoon,
-        vaste_telefoon,
-        iban,
-        bic,
-        sepa_machtiging_date,
-        sepa_referentie,
-        studentnummer,
-        now
-    ], function (error, results) {
-        if (error) {
-            console.error('Error occurred:', error);
-            return res.status(500).send('Registration failed');
-        }
-
-        res.redirect('/user/pending-approval');
-    });
-
-});
-
-userRouter.get('/pending-approval', (req, res) => {
-    res.render('user/pending-approval');
-});
 
 
 userRouter.get('/set-password', (req, res) => {
     const token = req.query.token;
     // Render the password setting form page, passing the token along
-    res.render('user/set-password', { token: token });
+    res.render('mijn-realtime/set-password', { token: token });
 });
+
+
 
 
 userRouter.post('/set-password', (req, res) => {
@@ -184,10 +64,29 @@ userRouter.post('/set-password', (req, res) => {
                 return res.status(500).send('Error setting password');
             }
 
-            res.redirect('/user/login');  // or wherever you want to direct them after setting their password
+            res.redirect('/login');  // or wherever you want to direct them after setting their password
         });
     });
 });
+
+userRouter.get('/profiel/2fa', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
+    res.render('mijn-realtime/2fa', {
+        user: req.user,
+    });
+});
+
+userRouter.get('/uitschrijven', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
+    res.render('mijn-realtime/uitschrijven', {
+        user: req.user,
+    });
+});
+
+userRouter.get('/agenda', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
+    res.render('mijn-realtime/agenda', {
+        user: req.user,
+    });
+});
+
 
 
 
@@ -197,7 +96,7 @@ userRouter.post('/set-password', (req, res) => {
 
 
 
-userRouter.get('/profile', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
+userRouter.get('/profiel', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
     const userId = req.user.id;
 
     connection.query('SELECT `imagePath` FROM `users` WHERE `id` = ?', [userId], function (error, results) {
@@ -208,7 +107,7 @@ userRouter.get('/profile', ensureAuthenticatedUser, userEnsure2fa, (req, res) =>
 
         if (results.length) {
             const user = results[0];
-            res.render('user/profile', {
+            res.render('mijn-realtime/profiel', {
                 user: req.user,
                 imagePath: user.imagePath
             });
@@ -227,7 +126,7 @@ userRouter.post('/upload', ensureAuthenticatedUser, userEnsure2fa, upload.single
         if (error) {
             return res.status(500).send('Error updating user profile image');
         }
-        res.redirect('/user/profile');
+        res.redirect('/mijn-realtime/profiel');
     });
 
 });
@@ -295,7 +194,7 @@ userRouter.post('/delete/:userId', ensureAuthenticatedUser, userEnsure2fa, (req,
                         return res.status(500).send('Error updating database');
                     }
 
-                    res.redirect('/user/profile');
+                    res.redirect('/mijn-realtime/profiel');
                 });
             });
         } else {
@@ -314,7 +213,7 @@ userRouter.post('/delete/:userId', ensureAuthenticatedUser, userEnsure2fa, (req,
 // Endpoint to setup 2FA for a user
 userRouter.get('/setup-2fa', ensureAuthenticatedUser, (req, res) => {
     // Generate a new 2FA secret for the user
-    const key = Totp.generateKey({ issuer: 'YourAppName', user: req.user.emailadres });
+    const key = Totp.generateKey({ issuer: 'SV-REALTIME', user: req.user.emailadres });
 
     req.session.temp2fa = key.secret;  // Store it temporarily until confirmed
 
@@ -324,8 +223,8 @@ userRouter.get('/setup-2fa', ensureAuthenticatedUser, (req, res) => {
     // Generate a QR Code for the user to scan
 
     qrcode.toDataURL(key.url, (err, dataUrl) => {
-        if (err) { return res.render('user/2fa/setup-2fa', { qrCode: dataUrl, secret: null, error: 'Some error message here' }); }
-        res.render('user/2fa/setup-2fa', { qrCode: dataUrl, secret: key.secret });
+        if (err) { return res.render('mijn-realtime/2fa/setup-2fa', { user: req.user, qrCode: dataUrl, secret: null, error: 'Some error message here' }); }
+        res.render('mijn-realtime/2fa/setup-2fa', { user: req.user, qrCode: dataUrl, secret: key.secret });
     });
 });
 
@@ -339,6 +238,7 @@ userRouter.post('/verify-2fa', ensureAuthenticatedUser, (req, res) => {
             if (error) {
                 return res.status(500).send('Error saving 2FA secret');
             }
+            req.session.is2faVerified = true;
             delete req.session.temp2fa;
             res.send('2FA setup successfully');
         });
@@ -349,9 +249,10 @@ userRouter.post('/verify-2fa', ensureAuthenticatedUser, (req, res) => {
 
 // check 2FA
 userRouter.get('/prompt-2fa', ensureAuthenticatedUser, (req, res, next) => {
-    if (!req.user.hasFA) { return res.redirect('/user/user-dashboard'); }
-    return res.render('user/2fa/prompt-2fa');
+    if (req.session.is2faVerified) { return res.redirect('/mijn-realtime/profiel'); }
+    return res.render('mijn-realtime/2fa/prompt-2fa', { user: undefined });
 });
+
 
 
 // Better error handling for 2FA verification:
@@ -364,9 +265,9 @@ userRouter.post('/check-2fa', ensureAuthenticatedUser, (req, res) => {
         }
         if (Totp.validate({ passcode: token, secret: results[0].twoFA_secret })) {
             req.session.is2faVerified = true;
-            res.redirect('user/user-dashboard');
+            res.redirect('/mijn-realtime/profiel');
         } else {
-            res.render('user/2fa/prompt-2fa', { error: 'Invalid token. Please try again.' });
+            res.render('mijn-realtime/2fa/prompt-2fa', { user: undefined, error: 'Invalid token. Please try again.' });
         }
     });
 });
@@ -375,7 +276,7 @@ userRouter.post('/check-2fa', ensureAuthenticatedUser, (req, res) => {
 // remove 2FA
 
 userRouter.get('/remove-2fa', ensureAuthenticatedUser, (req, res) => {
-    res.render('user/2fa/prompt-remove-2fa');  // This should be a view where the user inputs their current 2FA code to remove it
+    res.render('mijn-realtime/2fa/prompt-remove-2fa');  // This should be a view where the user inputs their current 2FA code to remove it
 });
 
 
@@ -396,16 +297,12 @@ userRouter.post('/confirm-remove-2fa', ensureAuthenticatedUser, (req, res) => {
                 res.send('2FA removed successfully');
             });
         } else {
-            res.render('user/2fa/prompt-remove-2fa', { error: 'Invalid token. Please try again.' });
+            res.render('mijn-realtime/2fa/prompt-remove-2fa', { error: 'Invalid token. Please try again.' });
         }
     });
 });
 
 
-
-userRouter.get('/session-hijacking', (req, res, next) => {
-    res.send('Nice try :)');
-});
 
 
 module.exports = userRouter;

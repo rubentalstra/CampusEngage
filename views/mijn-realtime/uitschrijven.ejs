@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>RealTime - Profiel</title>
+
+  <%- include('../includes/meta', {}); %>
+
+  <%- include('../includes/headLink', {}); %>
+
+  <style>
+    .content-header-background {
+      background-image: url('/img/banners/9094706bfd344c3cbbbffcc6d7fe3d0a-lg.png');
+    }
+  </style>
+</head>
+
+<body class="template-content webpage-5437 module-profile authenticated-user">
+
+  <%- include('../includes/header', {user: user}); %>
+
+
+  <section id="content">
+    <div class="content-header content-header-background">
+      <div class="container">
+        <ol class="breadcrumb">
+          <li><a href="/mijn-realtime">Mijn RealTime</a></li>
+          <li class="active">Uitschrijven</li>
+        </ol>
+        <h2>Uitschrijven</h2>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="aside col-md-3">
+          <ul id="submenu">
+            <li><a href="/mijn-realtime/profiel" title="">Profiel</a></li>
+            <li><a href="/mijn-realtime/groepen" title="">Groepen</a></li>
+            <li><a href="/mijn-realtime/smoelenboek" title="">Smoelenboek</a></li>
+            <li><a href="/mijn-realtime/merchandise" title="">Merchandise</a></li>
+            <li><a href="/mijn-realtime/agenda" title="">Agenda</a></li>
+            <li class="active"><a href="/mijn-realtime/uitschrijven" title="">Uitschrijven</a></li>
+          </ul>
+        </div>
+        <div class="paragraphs col-md-9">
+          <div class="row">
+            <div class=" col-md-12 paragraph-text paragraph-text-view">
+              <p>Wil jij je lidmaatschap opzeggen omdat je bijvoorbeeld met een nieuwe studie gaat beginnen? Stuur dan een e-mail naar <a data-cke-saved-href="mailto:secretaris@sv-realtime.nl?subject=Opzeggen%20lidmaatschap" href="mailto:secretaris@sv-realtime.nl?subject=Opzeggen%20lidmaatschap">secretaris@sv-realtime.nl</a> met daarin je verzoek tot uitschrijving met als onderwerp 'Opzeggen lidmaatschap'. Stuur deze mail <strong>vóór 1 september</strong> vanaf <strong>het e-mailadres waarmee je je hebt aangemeld</strong>. Indien dit niet gebeurt, wordt je pas voor het daaropvolgende jaar uitgeschreven en dient er contributie te worden betaald.</p>
+            </div>
+          </div>
+        </div>
+
+
+        <%- include('../includes/partners.ejs'); %>
+
+
+      </div>
+    </div>
+  </section>
+
+
+
+
+
+  <%- include('../includes/footer'); %>
+
+  <!-- generic javascript -->
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js" integrity="sha512-vO6PFSXNczuXHhdvGbOIXm67ZQlaRFjp4Wh+ARLfqPT1bVlmO1kyGrB1+7c2clk58XnsD/Cye9EJubT5B8BCgQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle2/20140216/jquery.cycle2.min.js" integrity="sha512-9pKhpjfZyETI7JvNCClrb4FN+nz9vPTvIRkIygeN5jRfMu4FQPTaePd3I2uLqOS6+hWjXJRwZHvUW+y9TUPJhw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- template javascript -->
+  <script src="/js/superfish-e25125463e3a68f85b0683f3bc21433b.js"></script>
+  <script src="/js/main-aac80d816f26db8660321cb022f841b1.js"></script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      let currentPath = window.location.pathname.split("/")[1]; // get the highest level of the path
+      let nav = document.querySelector(".header-nav");
+      let links = nav.querySelectorAll("a");
+
+      links.forEach(function(link) {
+        if (link.getAttribute("href").split("/")[1] === currentPath) {
+          link.parentElement.classList.add("path");
+        }
+      });
+    });
+  </script>
+
+
+
+
+</body>
+
+</html>

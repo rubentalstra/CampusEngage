@@ -25,6 +25,8 @@ const adminRouter = express.Router();
 
 
 
+
+
 adminRouter.use((req, res, next) => {
     if (!req.session.userAgent) {
         req.session.userAgent = req.headers['user-agent'];
@@ -58,9 +60,10 @@ adminRouter.get('/login', (req, res, next) => {
     res.render('admin/login');
 });
 
-adminRouter.post('/login', passportAdmins.authenticate('admin', {
+adminRouter.post('/login', passportAdmins.authenticate('local-admin', {
     failureRedirect: '/admin/login-failure',
     successRedirect: '/admin/prompt-2fa',
+    failureFlash: true
 }), (req, res, next) => {
     req.session.regenerate(function (err) {
         // will have a new session here
@@ -149,7 +152,7 @@ adminRouter.post('/send-password-setup', (req, res) => {
                 from: 'rubentalstra1211@outlook.com',
                 to: userEmailAddress,
                 subject: 'Set Up Your Password',
-                text: `Dear User, please click on the link to set up your password: https://localhost:8443/user/set-password?token=${token}`
+                text: `Dear User, please click on the link to set up your password: https://localhost:8443/mijn-realtime/set-password?token=${token}`
             };
 
             const info = await transporter.sendMail(mailOptions);
@@ -168,16 +171,13 @@ adminRouter.post('/send-password-setup', (req, res) => {
 
 
 // Endpoint to setup 2FA for a user
-adminRouter.get('/setup-2fa', isAuth, (req, res) => {
+adminRouter.get('/setup-2fa', ensureAuthenticatedAdmin, (req, res) => {
     // Generate a new 2FA secret for the user
-    const key = Totp.generateKey({ issuer: 'YourAppName', user: req.user.username });
+    const key = Totp.generateKey({ issuer: 'SV-REALTIME-ADMIN', user: req.user.username });
 
     req.session.temp2fa = key.secret;  // Store it temporarily until confirmed
 
-    console.log(key);
-
-    // Totp.generateKey({ issuer: "N0C", user: "johndoe@n0c.com" });
-    // Generate a QR Code for the user to scan
+    // console.log(key);
 
     qrcode.toDataURL(key.url, (err, dataUrl) => {
         if (err) { return res.render('admin/2fa/setup-2fa', { qrCode: dataUrl, secret: null, error: 'Some error message here' }); }
@@ -186,7 +186,7 @@ adminRouter.get('/setup-2fa', isAuth, (req, res) => {
 });
 
 // Endpoint to verify 2FA token
-adminRouter.post('/verify-2fa', isAuth, (req, res) => {
+adminRouter.post('/verify-2fa', ensureAuthenticatedAdmin, (req, res) => {
     const token = req.body.token;
 
     if (Totp.validate({ passcode: token, secret: req.session.temp2fa })) {
@@ -195,6 +195,7 @@ adminRouter.post('/verify-2fa', isAuth, (req, res) => {
             if (error) {
                 return res.status(500).send('Error saving 2FA secret');
             }
+            req.session.is2faVerified = true;
             delete req.session.temp2fa;
             res.send('2FA setup successfully');
         });
@@ -204,14 +205,14 @@ adminRouter.post('/verify-2fa', isAuth, (req, res) => {
 });
 
 // check 2FA
-adminRouter.get('/prompt-2fa', isAuth, (req, res, next) => {
-    if (!req.user.hasFA) { return res.redirect('/admin/admin-dashboard'); }
+adminRouter.get('/prompt-2fa', ensureAuthenticatedAdmin, (req, res, next) => {
+    // if (req.session.is2faVerified) { return res.redirect('/admin/admin-dashboard'); }
     return res.render('admin/2fa/prompt-2fa');
 });
 
 
 // Better error handling for 2FA verification:
-adminRouter.post('/check-2fa', isAuth, (req, res) => {
+adminRouter.post('/check-2fa', ensureAuthenticatedAdmin, (req, res) => {
     const token = req.body.token;
 
     connection.query('SELECT twoFA_secret FROM admins WHERE id = ?', [req.user.id], function (error, results) {
@@ -230,12 +231,12 @@ adminRouter.post('/check-2fa', isAuth, (req, res) => {
 
 // remove 2FA
 
-adminRouter.get('/remove-2fa', isAuth, (req, res) => {
+adminRouter.get('/remove-2fa', ensureAuthenticatedAdmin, (req, res) => {
     res.render('admin/2fa/prompt-remove-2fa');  // This should be a view where the user inputs their current 2FA code to remove it
 });
 
 
-adminRouter.post('/confirm-remove-2fa', isAuth, (req, res) => {
+adminRouter.post('/confirm-remove-2fa', ensureAuthenticatedAdmin, (req, res) => {
     const token = req.body.token;  // Get the 2FA token from the form
 
     connection.query('SELECT twoFA_secret FROM admins WHERE id = ?', [req.user.id], function (error, results) {
@@ -256,6 +257,8 @@ adminRouter.post('/confirm-remove-2fa', isAuth, (req, res) => {
         }
     });
 });
+
+
 
 
 module.exports = adminRouter;
