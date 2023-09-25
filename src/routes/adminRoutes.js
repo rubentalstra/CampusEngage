@@ -38,7 +38,7 @@ adminRouter.use((req, res, next) => {
             if (err) { return next(err); }
             req.session.destroy(function (err) {
                 if (err) { return next(err); }
-                res.redirect('/session-hijacking');
+                res.redirect('/admin/session-hijacking');
             });
             return;  // This is crucial, as you don't want any code after this block to run if a session is hijacked
         });
@@ -79,6 +79,7 @@ adminRouter.get('/login-failure', (req, res, next) => {
 adminRouter.get('/logout', (req, res, next) => {
     req.logout(function (err) {
         if (err) { return next(err); }
+        req.session.destroy();
         res.redirect('/admin/login');
     });
 });
@@ -137,7 +138,7 @@ adminRouter.post('/send-password-setup', (req, res) => {
     expirationDate.setHours(expirationDate.getHours() + 1);  // Token expires in 1 hour
 
     // Step 2: Save the token in the database with the user
-    connection.query('UPDATE users SET status = "verified", verification_token = ?, token_expiration_date = ? WHERE id = ?', [token, expirationDate, userId], function (error, results) {
+    connection.query('UPDATE `Members` SET status = "verified", verification_token = ?, token_expiration_date = ? WHERE id = ?', [token, expirationDate, userId], function (error, results) {
         if (error) {
             console.error('Error storing token:', error);
             return res.status(500).send('Error sending password setup email');
@@ -224,10 +225,15 @@ adminRouter.post('/check-2fa', ensureAuthenticatedAdmin, (req, res) => {
         if (error || results.length === 0) {
             return res.status(500).send('Error fetching 2FA secret');
         }
-        if (Totp.validate({ passcode: token, secret: results[0].twoFA_secret })) {
-            req.session.is2faVerified = true;
-            res.redirect('/admin/admin-dashboard');
-        } else {
+
+        try {
+            if (Totp.validate({ passcode: token, secret: results[0].twoFA_secret })) {
+                req.session.is2faVerified = true;
+                return res.redirect('/admin/admin-dashboard');
+            }
+
+            res.render('admin/2fa/prompt-2fa', { error: 'Invalid token. Please try again.' });
+        } catch (error) {
             res.render('admin/2fa/prompt-2fa', { error: 'Invalid token. Please try again.' });
         }
     });

@@ -9,6 +9,8 @@ const { generateToken } = require('../utilities/crypto');
 const { updatePdfFields } = require('../middleware/pdf');
 const { convertToMySQLDate } = require('../middleware/utils');
 const { v4: uuidv4 } = require('uuid'); // Ensure you have the 'uuid' package installed
+const Page = require('../models/page');
+const sequelize = require('../config/database-pages');
 
 
 
@@ -56,6 +58,66 @@ router.get('/lid-worden', (req, res) => {
         user: undefined,
     });
 });
+
+// TEST create pages.
+
+router.get('/create', async (req, res) => {
+    try {
+        // Fetch all potential parent pages
+        const parentPages = await Page.findAll();
+
+        // Render the form
+        res.render('page-create', { parentPages });
+    } catch (error) {
+        console.error('Error fetching parent pages:', error);
+        res.status(500).send('Server error');
+    }
+});
+
+
+
+router.post('/create', async (req, res) => {
+    try {
+        const { title, content, parentId } = req.body;
+
+        let pageData = {
+            title: title,
+            content: content
+        };
+
+        // Check if parentId was provided and is not an empty string
+        if (parentId && parentId.trim() !== '') {
+            pageData.parentId = parseInt(parentId, 10);  // Convert string parentId to integer
+        }
+
+        await Page.create(pageData);
+
+        res.redirect('/create');
+    } catch (err) {
+        console.error('Error creating page:', err);
+        res.status(500).send('Server Error');
+    }
+});
+
+
+
+// sequelize.sync();
+
+router.get('/page/*', async (req, res) => {
+    const slugs = req.params[0].split('/');
+    const slug = slugs[slugs.length - 1];
+
+    const page = await Page.findOne({ where: { slug: slug } });
+    const pages = await Page.findAll();  // fetch all pages for the navbar
+
+    if (!page) {
+        return res.status(404).send('Page not found');
+    }
+
+    res.render('layout', { page, pages });
+});
+
+// END test create pages
 
 router.post('/lid-worden/direct-debit/download', async (req, res) => {
     const { fullName, iban, bic } = req.body;
@@ -142,7 +204,7 @@ router.get('/login-failure', (req, res, next) => {
 router.get('/logout', (req, res, next) => {
     req.logout(function (err) {
         if (err) { return next(err); }
-        req.session.is2faVerified = false;
+        req.session.destroy();
         res.redirect('/');
     });
 });
@@ -173,7 +235,7 @@ router.post('/password/forgot', (req, res) => {
         expirationDate.setHours(expirationDate.getHours() + 1);  // Token expires in 1 hour
 
         // Step 2: Save the token in the database with the user
-        connection.query('UPDATE users SET verification_token = ?, token_expiration_date = ? WHERE emailadres = ?', [token, expirationDate, user.emailadres], async function (error) {
+        connection.query('UPDATE `Members` SET verification_token = ?, token_expiration_date = ? WHERE emailadres = ?', [token, expirationDate, user.emailadres], async function (error) {
             if (error) {
                 console.error('Error storing token:', error);
                 return res.status(500).send('Error sending password setup email');

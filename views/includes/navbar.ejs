@@ -1,0 +1,47 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+
+    <!--  -->
+    <ul class="navbar-nav">
+      <% pages.filter(page => !page.parentId).forEach(parentPage => { %>
+
+      <% const childPages = pages.filter(page => page.parentId === parentPage.id); %>
+
+      <!-- If there are child pages, create a dropdown -->
+      <% if(childPages.length > 0) { %>
+      <li class="nav-item dropdown">
+        <a class="nav-link" href="/page/<%= parentPage.slug %>">
+          <%= parentPage.title %>
+          <span data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;">▼</span>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown<%= parentPage.id %>">
+          <% childPages.forEach(childPage => { %>
+          <a class="dropdown-item" href="/page/<%= childPage.slug %>"><%= childPage.title %></a>
+
+          <% const grandChildPages = pages.filter(page => page.parentId === childPage.id); %>
+
+          <% grandChildPages.forEach(grandChild => { %>
+          <!-- Indent or style the grandchild pages differently to distinguish them from child pages -->
+          <a class="dropdown-item ml-3" href="/page/<%= grandChild.slug %>"><%= grandChild.title %></a>
+          <% }); %>
+          <% }); %>
+        </div>
+
+      </li>
+
+      <!-- If there are no child pages, create a simple link -->
+      <% } else { %>
+      <li class="nav-item">
+        <a class="nav-link" href="/page/<%= parentPage.slug %>"><%= parentPage.title %></a>
+      </li>
+      <% } %>
+
+      <% }) %>
+    </ul>
+
+    <!--  -->
+  </div>
+</nav>

@@ -58,7 +58,7 @@ userRouter.post('/set-password', (req, res) => {
         const salt = saltHash.salt;
         const hash = saltHash.hash;
 
-        connection.query('UPDATE users SET status = "active", hash = ?, salt = ?, verification_token = NULL, token_expiration_date = NULL WHERE id = ?', [hash, salt, user.id], function (updateError, updateResults) {
+        connection.query('UPDATE `Members` SET status = "active", hash = ?, salt = ?, verification_token = NULL, token_expiration_date = NULL WHERE id = ?', [hash, salt, user.id], function (updateError, updateResults) {
             if (updateError) {
                 console.error('Error updating password:', updateError);
                 return res.status(500).send('Error setting password');
@@ -123,7 +123,7 @@ userRouter.post('/upload', ensureAuthenticatedUser, userEnsure2fa, upload.single
     const publicImage = req.body.public ? 1 : 0;
 
     // Check if the user is the owner
-    connection.query('UPDATE `users` SET `imagePath` = ?, `publicImage` = ? WHERE `id` = ?', [req.file.path, publicImage, userId], function (error) {
+    connection.query('UPDATE `Members` SET `imagePath` = ?, `publicImage` = ? WHERE `id` = ?', [req.file.path, publicImage, userId], function (error) {
         if (error) {
             return res.status(500).send('Error updating user profile image');
         }
@@ -189,7 +189,7 @@ userRouter.post('/delete/:userId', ensureAuthenticatedUser, userEnsure2fa, (req,
                 }
 
                 // Update database after file deletion
-                connection.query('UPDATE `users` SET `imagePath` = NULL, `publicImage` = 0 WHERE `id` = ?', [userId], (dbError) => {
+                connection.query('UPDATE `Members` SET `imagePath` = NULL, `publicImage` = 0 WHERE `id` = ?', [userId], (dbError) => {
                     if (dbError) {
                         console.error(dbError);
                         return res.status(500).send('Error updating database');
@@ -235,7 +235,7 @@ userRouter.post('/verify-2fa', ensureAuthenticatedUser, (req, res) => {
 
     if (Totp.validate({ passcode: token, secret: req.session.temp2fa })) {
         // Save the 2FA secret in database (make sure it's encrypted or securely stored)
-        connection.query('UPDATE users SET twoFA_secret = ?, hasFA = ? WHERE id = ?', [req.session.temp2fa, 1, req.user.id], function (error) {
+        connection.query('UPDATE `Members` SET twoFA_secret = ?, hasFA = ? WHERE id = ?', [req.session.temp2fa, 1, req.user.id], function (error) {
             if (error) {
                 return res.status(500).send('Error saving 2FA secret');
             }
@@ -250,6 +250,7 @@ userRouter.post('/verify-2fa', ensureAuthenticatedUser, (req, res) => {
 
 // check 2FA
 userRouter.get('/prompt-2fa', ensureAuthenticatedUser, (req, res, next) => {
+    if (!req.user.hasFA) { return res.redirect('/mijn-realtime/profiel'); }
     if (req.session.is2faVerified) { return res.redirect('/mijn-realtime/profiel'); }
     return res.render('mijn-realtime/2fa/prompt-2fa', { user: undefined });
 });
@@ -264,10 +265,15 @@ userRouter.post('/check-2fa', ensureAuthenticatedUser, (req, res) => {
         if (error || results.length === 0) {
             return res.status(500).send('Error fetching 2FA secret');
         }
-        if (Totp.validate({ passcode: token, secret: results[0].twoFA_secret })) {
-            req.session.is2faVerified = true;
-            res.redirect('/mijn-realtime/profiel');
-        } else {
+
+        try {
+            if (Totp.validate({ passcode: token, secret: results[0].twoFA_secret })) {
+                req.session.is2faVerified = true;
+                return res.redirect('/mijn-realtime/profiel');
+            }
+
+            res.render('mijn-realtime/2fa/prompt-2fa', { user: undefined, error: 'Invalid token. Please try again.' });
+        } catch (error) {
             res.render('mijn-realtime/2fa/prompt-2fa', { user: undefined, error: 'Invalid token. Please try again.' });
         }
     });
@@ -291,7 +297,7 @@ userRouter.post('/confirm-remove-2fa', ensureAuthenticatedUser, (req, res) => {
 
         if (Totp.validate({ passcode: token, secret: results[0].twoFA_secret })) {
             // Valid token, remove 2FA setup
-            connection.query('UPDATE users SET twoFA_secret = NULL, hasFA = 0 WHERE id = ?', [req.user.id], function (error) {
+            connection.query('UPDATE `Members` SET twoFA_secret = NULL, hasFA = 0 WHERE id = ?', [req.user.id], function (error) {
                 if (error) {
                     return res.status(500).send('Error removing 2FA setup');
                 }
