@@ -7,8 +7,9 @@ const { generateToken, genPassword } = require('../utilities/crypto');
 const { isAuth, ensureAuthenticatedAdmin, adminEnsure2fa } = require('../middleware/auth');
 
 const transporter = require('../utilities/mailer');
-const { getAdminDashboard, getMembersNotActive } = require('../controller/adminController');
+const { getAdminDashboard, renderMemberPage } = require('../controller/adminController');
 const { userExists } = require('../middleware/utils');
+const adminApiRouter = require('./admin/api');
 const adminRouter = express.Router();
 
 // const { isAuth, ensure2fa } = require('../middleware/auth');
@@ -114,14 +115,18 @@ adminRouter.post('/register', userExists, (req, res, next) => {
 
 
 
+
+
 adminRouter.get('/admin-route', ensureAuthenticatedAdmin, adminEnsure2fa, (req, res, next) => {
     res.send('<h1>You are admin</h1><p><a href="/logout">Logout and reload</a></p>');
 });
 
+adminRouter.use('/api', ensureAuthenticatedAdmin, adminEnsure2fa, adminApiRouter);
+
 adminRouter.get('/admin-dashboard', ensureAuthenticatedAdmin, adminEnsure2fa, getAdminDashboard);
 
 
-adminRouter.get('/administration/members', ensureAuthenticatedAdmin, adminEnsure2fa, getMembersNotActive);
+adminRouter.get('/administration/members', ensureAuthenticatedAdmin, adminEnsure2fa, renderMemberPage);
 
 adminRouter.get('/managment/events', ensureAuthenticatedAdmin, adminEnsure2fa, (req, res) => {
     res.render('admin/managment/events/index', { user: req.user });  // This should be a view where the user inputs their current 2FA code to remove it

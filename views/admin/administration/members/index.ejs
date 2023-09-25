@@ -9,6 +9,14 @@
 
   <link href="/css/app.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    .selected-type {
+      background-color: #222e3c;
+      /* Bootstrap primary color */
+      color: rgba(233, 236, 239, .75);
+    }
+  </style>
 </head>
 
 <body>
@@ -23,16 +31,37 @@
 
       <main class="content">
         <div class="container-fluid p-0">
-
           <h1 class="h3 mb-3">Blank Page</h1>
 
+          <!-- Member Types and Table in one row -->
           <div class="row">
-            <div class="col-12">
+            <!-- Member Types Filter -->
+            <div class="col-md-3 mb-2">
               <div class="card">
-
+                <div class="card-header">
+                  Filter by Member Type
+                </div>
                 <div class="card-body">
+                  <% Object.keys(categorizedTypes).forEach(category => { %>
+                  <h5><%= category %></h5>
+                  <ul class="list-group mb-3">
+                    <% categorizedTypes[category].forEach(type => { %>
 
+                    <li class="list-group-item d-flex justify-content-between align-items-center" style="cursor:pointer;" onclick="fetchMembersByTypeId('<%= type.id %>')">
+                      <%= type.type_name %>
+                      <span class="badge-primary badge-pill" id="typeCount_<%= type.id %>"><%= type.count %></span>
+                    </li>
+                    <% }); %>
+                  </ul>
+                  <% }); %>
+                </div>
+              </div>
+            </div>
 
+            <!-- Table -->
+            <div class="col-md-9">
+              <div class="card">
+                <div class="card-body">
                   <table class="table table-hover my-0">
                     <thead>
                       <tr>
@@ -43,27 +72,15 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <% users.forEach(user => { %>
-                      <tr>
-                        <td><%= user.id %></td>
-                        <td><%= user.first_name %> <%= user.primary_last_name_main %></td>
-                        <td><%= user.emailadres %></td>
-                        <td>
-                          <button onclick="sendEmail('<%= user.id %>')">Send Email</button>
-                        </td>
-                      </tr>
-                      <% }); %>
                     </tbody>
                   </table>
-
-
                 </div>
               </div>
             </div>
           </div>
-
         </div>
       </main>
+
 
 
       <%- include('../../includes/footer'); %>
@@ -88,6 +105,70 @@
         }
       });
     });
+
+
+    function loadTypeCounts() {
+      fetch('/admin/api/members/typeCounts')
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(count => {
+            let countElement = document.getElementById(`typeCount_${count.member_type_id}`);
+            if (countElement) {
+              countElement.innerText = count.count;
+            }
+          });
+        });
+    }
+
+    loadTypeCounts();
+
+    function fetchMembersByTypeId(typeId) {
+      fetch(`/admin/api/members/type/${typeId}`)
+        .then(response => response.json())
+        .then(data => {
+          let tbody = document.querySelector('.table tbody');
+          tbody.innerHTML = ''; // Clear the tbody
+
+          data.forEach(user => {
+            let tr = document.createElement('tr');
+
+            let idTd = document.createElement('td');
+            idTd.innerText = user.id;
+
+            let nameTd = document.createElement('td');
+            nameTd.innerText = `${user.first_name} ${user.primary_last_name_main}`;
+
+            let emailTd = document.createElement('td');
+            emailTd.innerText = user.emailadres;
+
+            let actionTd = document.createElement('td');
+            let btn = document.createElement('button');
+            btn.innerText = 'Send Email';
+            btn.onclick = function() {
+              sendEmail(user.id);
+            };
+            actionTd.appendChild(btn);
+
+            tr.appendChild(idTd);
+            tr.appendChild(nameTd);
+            tr.appendChild(emailTd);
+            tr.appendChild(actionTd);
+
+            tbody.appendChild(tr);
+          });
+        });
+
+      // Highlighting logic:
+      document.querySelectorAll('.list-group-item').forEach(item => {
+        item.classList.remove('selected-type'); // Remove highlight from all items
+      });
+      let selectedItem = document.querySelector(`.list-group-item[onclick="fetchMembersByTypeId('${typeId}')"]`);
+      if (selectedItem) {
+        selectedItem.classList.add('selected-type'); // Add highlight to the clicked item
+      }
+
+    }
+
 
 
     function sendEmail(userId) {
