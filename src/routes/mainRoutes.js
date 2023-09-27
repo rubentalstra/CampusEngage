@@ -12,7 +12,7 @@ const { v4: uuidv4 } = require('uuid'); // Ensure you have the 'uuid' package in
 const Page = require('../models/page');
 const sequelize = require('../config/database-pages');
 const { ensureAuthenticatedUser, userEnsure2fa } = require('../middleware/auth');
-const { webhookVerification } = require('../utilities/mollie');
+const { webhookVerification, createPayment, refundTransaction } = require('../utilities/mollie');
 
 
 
@@ -47,8 +47,9 @@ router.get('/', (req, res, next) => {
 
 
 
-
-router.post('/webhook', ensureAuthenticatedUser, userEnsure2fa, webhookVerification);
+router.get('/create-payment', ensureAuthenticatedUser, userEnsure2fa, createPayment);
+router.get('/refund', refundTransaction);
+router.post('/webhook', webhookVerification);
 // router.post('/redirect', ensureAuthenticatedUser, userEnsure2fa, webhookVerification);
 
 

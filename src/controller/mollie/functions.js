@@ -20,11 +20,15 @@ async function getTransactionByMemberAndEventID(memberId, eventId) {
 }
 
 
-async function createRefundRecord(transactionID, refundPaymentID, amount) {
+async function createRefundRecord(transactionID, refundPaymentID, amount, RefundStatus) {
     try {
+
+        const orderId = await generateOrderID();
+
+
         const result = await query(
-            'INSERT INTO Refunds (TransactionID, RefundPaymentID, Amount, RefundStatus) VALUES (?, ?, ?, "Refunded")',
-            [transactionID, refundPaymentID, amount]
+            'INSERT INTO Refunds (TransactionID, RefundPaymentID, MollieID, Amount, RefundStatus) VALUES (?, ?, ?, ?, ?)',
+            [transactionID, orderId, refundPaymentID, amount, RefundStatus]
         );
         return result.insertId;  // return ID of the new record
     } catch (error) {
@@ -46,27 +50,18 @@ async function updateTransactionStatus(transactionID, status) {
     }
 }
 
-// module.exports = {
-//     getTransactionByMemberAndTicketType,
-//     getTicketTypeByID,
-//     createRefundRecord,
-//     updateTransactionStatus
-// };
-
-
-// async function getTicketTypeByID(ticketTypeID) {
-//     const sql = 'SELECT * FROM TicketTypes WHERE TicketTypeID = ?';
-//     const results = await query(sql, [ticketTypeID]);
-//     return results[0];
-// }
-
-// async function updateTransactionStatus(transactionID, status) {
-//     const sql = 'UPDATE Transactions SET Status = ? WHERE TransactionID = ?';
-//     return await query(sql, [status, transactionID]);
-// }
-
-
-
+async function updateTransactionRefundStatus(transactionID, RefundStatus) {
+    try {
+        const result = await query(
+            'UPDATE Transactions SET RefundStatus = ?, UpdatedAt = NOW() WHERE TransactionID = ?',
+            [RefundStatus, transactionID]
+        );
+        return result.affectedRows > 0;  // return true if at least one record was updated
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+}
 
 
 async function generateOrderID() {
@@ -99,7 +94,13 @@ async function fetchAndUpdateLastOrderNumberFromDB(currentYear) {
             WHERE RefundPaymentID LIKE ?`;
 
 
-    const [transactionsResult, refundsResult] = Promise.all([query(transactionsSql, [`${currentYear}%`]), query(refundsSql, [`${currentYear}%`])]);
+    // const [transactionsResult, refundsResult] = Promise.all([query(transactionsSql, [`${currentYear}%`]), query(refundsSql, [`${currentYear}%`])]);
+
+    const [transactionsResult, refundsResult] = await Promise.all([
+        query(transactionsSql, [`${currentYear}%`]),
+        query(refundsSql, [`${currentYear}%`])
+    ]);
+
     // const transactionsResult = await query(transactionsSql, [`${currentYear}%`]);
     // const refundsResult = await query(refundsSql, [`${currentYear}%`]);
 
@@ -116,4 +117,4 @@ async function fetchAndUpdateLastOrderNumberFromDB(currentYear) {
 
 
 
-module.exports = { getTransactionByMemberAndEventID, createRefundRecord, updateTransactionStatus, generateOrderID };
+module.exports = { getTransactionByMemberAndEventID, createRefundRecord, updateTransactionStatus, updateTransactionRefundStatus, generateOrderID };
