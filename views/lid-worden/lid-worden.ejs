@@ -197,11 +197,9 @@
                     <div class="row">
                       <div class="col-xs-4 small-gutter">
                         <select class="form-control phone phone-country rounded default-input-border" id="phone_mobile-country" name="phone_mobile-country">
-                          <option value="3">+93 (Afghanistan)</option>
-                          <option value="4">+355 (Albanië)</option>
-                          <option value="5">+213 (Algerije)</option>
-                          <option value="6">+376 (Andorra)</option>
-
+                          <% countries.forEach(country => { %>
+                          <option value="<%= country.country_id %>">(+<%= country.country_phone %>) <%= country.country_name %></option>
+                          <% }); %>
                         </select>
                       </div>
                       <div class="col-xs-8">
@@ -217,11 +215,9 @@
                     <div class="row">
                       <div class="col-xs-4 small-gutter">
                         <select class="form-control phone phone-country rounded default-input-border" id="phone_home-country" name="phone_home-country">
-                          <option value="3">+93 (Afghanistan)</option>
-                          <option value="4">+355 (Albanië)</option>
-                          <option value="5">+213 (Algerije)</option>
-                          <option value="6">+376 (Andorra)</option>
-
+                          <% countries.forEach(country => { %>
+                          <option value="<%= country.country_id %>">(+<%= country.country_phone %>) <%= country.country_name %></option>
+                          <% }); %>
                         </select>
                       </div>
                       <div class="col-xs-8">
@@ -244,11 +240,9 @@
                       </div>
                     </div>
                     <select class="form-control address address-country rounded default-input-border" id="address-country" name="address-country" placeholder="Land" required="">
-                      <option value="3">Afghanistan</option>
-                      <option value="4">Albanië</option>
-                      <option value="5">Algerije</option>
-                      <option value="6">Andorra</option>
-
+                      <% countries.forEach(country => { %>
+                      <option value="<%= country.country_id %>"><%= country.country_name %></option>
+                      <% }); %>
                     </select>
 
 

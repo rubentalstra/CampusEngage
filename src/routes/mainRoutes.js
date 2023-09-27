@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getHomePage } = require('../controller/mainController');
+const { getHomePage, getLidWordenCountriesInformation } = require('../controller/mainController');
 const passportUser = require('../config/passportUsers');
 const userRouter = require('./userRoutes');
 const connection = require('../config/database');
@@ -54,8 +54,17 @@ router.get('/mijn-realtime', (req, res) => {
 });
 
 router.get('/lid-worden', (req, res) => {
-    res.render('lid-worden/lid-worden', {
-        user: undefined,
+    connection.query('SELECT countries.country_id, countries.country_phone, countries.country_name FROM countries ORDER BY countries.country_name ASC', (error, countries) => {
+        if (error) {
+            console.error('Error fetching type counts:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+
+        res.render('lid-worden/lid-worden', {
+            user: undefined,
+            countries: countries
+        });
     });
 });
 
