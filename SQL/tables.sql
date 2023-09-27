@@ -104,3 +104,19 @@ CREATE TABLE Attendees (
     FOREIGN KEY (TicketTypeID) REFERENCES TicketTypes(TicketTypeID),
     FOREIGN KEY (MemberID) REFERENCES Members(id)
 );
+
+
+
+
+
+CREATE TABLE `Refunds` (
+  `RefundID` int NOT NULL AUTO_INCREMENT,
+  `TransactionID` int NOT NULL,
+  `RefundPaymentID` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `Amount` decimal(10,2) NOT NULL,
+  `RefundStatus` enum('Queued','Pending','Processing','Refunded','Failed','Canceled') NOT NULL,
+  `RefundDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`RefundID`),
+  KEY `fk_Refunds_Transactions` (`TransactionID`),
+  CONSTRAINT `fk_Refunds_Transactions` FOREIGN KEY (`TransactionID`) REFERENCES `Transactions` (`TransactionID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

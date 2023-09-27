@@ -11,6 +11,8 @@ const { convertToMySQLDate } = require('../middleware/utils');
 const { v4: uuidv4 } = require('uuid'); // Ensure you have the 'uuid' package installed
 const Page = require('../models/page');
 const sequelize = require('../config/database-pages');
+const { ensureAuthenticatedUser, userEnsure2fa } = require('../middleware/auth');
+const { webhookVerification } = require('../utilities/mollie');
 
 
 
@@ -42,6 +44,14 @@ router.use((req, res, next) => {
 router.get('/', (req, res, next) => {
     res.render('index', { user: req.user });
 });
+
+
+
+
+router.post('/webhook', ensureAuthenticatedUser, userEnsure2fa, webhookVerification);
+// router.post('/redirect', ensureAuthenticatedUser, userEnsure2fa, webhookVerification);
+
+
 
 router.get('/contact', (req, res, next) => {
     res.render('contact', { user: req.user });
