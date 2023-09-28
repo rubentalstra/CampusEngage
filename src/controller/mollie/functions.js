@@ -3,6 +3,7 @@ const query = require('../../config/database-all');
 
 
 
+
 async function getTransactionByMemberAndEventID(memberId, eventId) {
     try {
         const transactions = await query(
@@ -85,9 +86,9 @@ async function fetchAndUpdateLastOrderNumberFromDB(currentYear) {
 
     // Fetch the maximum PaymentID for the current year from both tables
     const transactionsSql = `
-            SELECT MAX(SUBSTRING(PaymentID, 6)) as maxID
-            FROM Transactions
-            WHERE PaymentID LIKE ?`;
+            SELECT MAX(SUBSTRING(OrderID, 6)) as maxID
+            FROM Orders
+            WHERE OrderID LIKE ?`;
     const refundsSql = `
             SELECT MAX(SUBSTRING(RefundPaymentID, 6)) as maxID
             FROM Refunds

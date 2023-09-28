@@ -2,7 +2,7 @@ module.exports = {
     apps: [
         {
             name: 'sv-realtime',
-            script: './app.js',
+            script: './server.js',
             watch: true,
             instances: '1',
             exec_mode: 'fork',
@@ -17,7 +17,7 @@ module.exports = {
         },
         {
             name: 'sv-realtime',
-            script: './app.js',
+            script: './server-admin.js',
             watch: true,
             instances: '1',
             exec_mode: 'fork',

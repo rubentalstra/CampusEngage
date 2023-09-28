@@ -17,7 +17,7 @@ async function createPayment(req, res) {
     try {
         // Query the database to get ticket type details
         // Replace this query if your actual table and column names are different
-        const ticketTypeSql = 'SELECT * FROM TicketTypes WHERE TicketTypeID = ?';
+        const ticketTypeSql = 'SELECT * FROM Tickets WHERE TicketID = ?';
         const ticketTypeResult = await query(ticketTypeSql, [ticketTypeId]);
 
         if (ticketTypeResult.length === 0) {
@@ -39,7 +39,7 @@ async function createPayment(req, res) {
 
         // Insert a new transaction record into the database with status "Open"
         const insertTransactionSql = `
- INSERT INTO Transactions (TicketTypeID, MemberID, PaymentID, Amount, Currency, Status)
+ INSERT INTO Transactions (TicketID, MemberID, OrderID, Amount, Currency, Status)
  VALUES (?, ?, ?, ?, ?, 'Open');
 `;
         await query(insertTransactionSql, [ticketTypeId, req.user.id, orderId, amount, currency]);
@@ -51,8 +51,8 @@ async function createPayment(req, res) {
             description,
             // redirectUrl: `https://localhost:8443/redirect?orderId=${orderId}`,
             // 
-            redirectUrl: `https://d507-217-103-53-31.ngrok-free.app/`,
-            webhookUrl: `https://d507-217-103-53-31.ngrok-free.app/webhook?orderId=${orderId}`,
+            redirectUrl: `${process.env.MOLLIE_URL}/`,
+            webhookUrl: `${process.env.MOLLIE_URL}/webhook?orderId=${orderId}`,
             metadata: { orderId, ticketTypeId: ticketTypeId },
         })
             .then(payment => {
@@ -90,7 +90,7 @@ function webhookVerification(req, res) {
                 // console.log(orderID);
                 // Update status in database
                 try {
-                    await query('UPDATE Transactions SET Status = ?, MollieID = ? WHERE PaymentID = ?', ['Paid', req.body.id, req.query.orderId]);
+                    await query('UPDATE Transactions SET Status = ?, MollieID = ? WHERE OrderID = ?', ['Paid', req.body.id, req.query.orderId]);
                     res.send('Payment is paid and status updated in database');
                 } catch (dbError) {
                     console.error(dbError);
@@ -100,7 +100,7 @@ function webhookVerification(req, res) {
                 // Payment is canceled by the customer
                 // Update status in database
                 try {
-                    await query('UPDATE Transactions SET Status = ?, MollieID = ? WHERE PaymentID = ?', ['Canceled', req.body.id, req.query.orderId]);
+                    await query('UPDATE Transactions SET Status = ?, MollieID = ? WHERE OrderID = ?', ['Canceled', req.body.id, req.query.orderId]);
                     res.send('Payment is canceled and status updated in database');
                 } catch (dbError) {
                     console.error(dbError);
@@ -110,7 +110,7 @@ function webhookVerification(req, res) {
                 // The payment isn't paid, isn't open, and isn't canceled. We can assume it was aborted or failed.
                 // Update status in database
                 try {
-                    await query('UPDATE Transactions SET Status = ?, MollieID = ? WHERE PaymentID = ?', ['Failed', req.body.id, req.query.orderId]);
+                    await query('UPDATE Transactions SET Status = ?, MollieID = ? WHERE OrderID = ?', ['Failed', req.body.id, req.query.orderId]);
                     res.send('Payment is not open, not paid, not canceled, and status updated in database');
                 } catch (dbError) {
                     console.error(dbError);

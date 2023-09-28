@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getHomePage, getLidWordenCountriesInformation } = require('../controller/mainController');
+const { getHomePage, getLidWordenCountriesInformation, getEvents } = require('../controller/mainController');
 const passportUser = require('../config/passportUsers');
 const userRouter = require('./userRoutes');
 const connection = require('../config/database');
@@ -45,6 +45,14 @@ router.get('/', (req, res, next) => {
     res.render('index', { user: req.user });
 });
 
+
+
+router.get('/evenementen', (req, res) => {
+
+    const events = getEvents(req, res);
+
+    res.render('evenementen', { user: req.user ?? undefined, events: events });
+});
 
 
 router.get('/create-payment', ensureAuthenticatedUser, userEnsure2fa, createPayment);

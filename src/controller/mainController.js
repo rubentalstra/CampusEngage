@@ -22,3 +22,16 @@ exports.getLidWordenCountriesInformation = (req, res) => {
         return countries;
     });
 };
+
+
+exports.getEvents = (req, res) => {
+    connection.query('SELECT * FROM Events WHERE EndDateTime > NOW() AND Published = "published" ORDER BY StartDateTime ASC', (error, events) => {
+        if (error) {
+            console.error('Error fetching Events:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+
+        return events;
+    });
+};

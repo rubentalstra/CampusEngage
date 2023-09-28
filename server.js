@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const passportUser = require('./src/config/passportUsers');
 const router = require('./src/routes/mainRoutes');
+const { env } = require('process');
 const MySQLStore = require('express-mysql-session')(session);
 
 
@@ -65,7 +66,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === 'ngrok' ? false : true,
         session: true,
     }
 }));
@@ -96,7 +97,13 @@ const options = {
     cert: fs.readFileSync(`./cert/server.crt`),
 };
 
-const server = https.createServer(options, app);
-server.listen(process.env.PORT, () => {
-    console.log(`App listening on port ${process.env.PORT}!`);
-});
+if (process.env.NODE_ENV !== 'ngrok') {
+    const server = https.createServer(options, app);
+    server.listen(process.env.PORT, () => {
+        console.log(`App listening on port ${process.env.PORT}!`);
+    });
+} else {
+    app.listen(process.env.PORT_NGROK, () => {
+        console.log(`App listening on port ${process.env.PORT_NGROK}!`);
+    });
+}
