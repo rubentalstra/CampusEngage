@@ -48,7 +48,31 @@
 
 
           <div class="row">
+
+            <% events.forEach(element => { %>
             <div class="col-md-10">
+              <div class="event-header">
+                <h3><a href="/evenementen/<%= element.EventID  %>" title="<%= element.Name  %>"><%= element.Name  %></a></h3>
+                <ul class="list-unstyled list-inline text-muted small meta-list">
+                  <li><span class="fa fa-calendar"></span> 28 sep. 2023 16:00 - 19:30</li>
+                  <li><span class="fa fa-tag"></span> Educatief</li>
+                  <li><span class="fa fa-group"></span> 11 deelnemers</li>
+                  <li class="text-success meta-tag is-success">Aanmelding open</li>
+                  <!-- <li class="text-success meta-tag is-success">Tickets te koop</li> -->
+                  <!-- <li class="text-primary meta-tag is-primary">Uitverkocht</li> -->
+                </ul>
+              </div>
+              <p>Ben je een op zoek naar een leuke werkgever / afstudeerstage? Heb je interesse in DevOps, cloud development of AWS? Kom dan naar het partnerevenement van TheFactorE! TheFactorE AWS Cloud Friesestraatweg 215a, 9743 AD Groningen Gratis toegang 16:00 - 19:30 Drinken en avond eten is inbegrepen (pizza) &nbsp;</p>
+              <p>
+                <a class="btn btn-link" href="/evenementen/<%= element.EventID  %>"><i class="fa fa-fw fa-chevron-circle-right"></i> Meer informatie</a>
+              </p>
+            </div>
+            <div class="col-md-12">
+              <hr>
+            </div>
+            <% }) %>
+
+            <!-- <div class="col-md-10">
               <div class="event-header">
                 <h3><a href="/evenementen/thefactore-aws-cloud" title="TheFactorE AWS Cloud">TheFactorE AWS Cloud</a></h3>
                 <ul class="list-unstyled list-inline text-muted small meta-list">
@@ -116,7 +140,11 @@
             </div>
             <div class="col-md-12">
               <hr>
-            </div>
+            </div> -->
+
+
+
+            <!-- END ROW -->
           </div>
 
 

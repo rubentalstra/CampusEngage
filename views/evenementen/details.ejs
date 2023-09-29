@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>RealTime - <%= eventDetails.Name %></title>
+
+  <%- include('../includes/meta', {}); %>
+
+  <%- include('../includes/headLink', {}); %>
+
+  <style>
+    .content-header-background {
+      background-image: url('/img/banners/9094706bfd344c3cbbbffcc6d7fe3d0a-lg.png');
+    }
+  </style>
+</head>
+
+<body class="template-content webpage-5437 module-profile authenticated-user">
+
+  <%- include('../includes/header', {user: user}); %>
+
+  <section id="content">
+
+    <div class="content-header content-header-background">
+      <div class="container">
+        <ol class="breadcrumb">
+          <li><a href="/evenementen">Evenementen</a></li>
+          <li class="active"><%= eventDetails.Name %></li>
+        </ol>
+        <h2><%= eventDetails.Name %></h2>
+      </div>
+    </div>
+
+
+    <div class="container">
+
+
+      <div class="row">
+        <div class="aside col-md-3">
+          <ul id="submenu">
+            <li class="active"><a href="/evenementen" title="">Evenementen</a>
+              <ul>
+                <li><a href="/evenementen" title="">Binnenkort</a> </li>
+                <li><a href="/evenementen/calendar" title="">Kalender</a> </li>
+              </ul>
+            </li>
+          </ul>
+
+          <!-- <div class="aside-block">
+            <a class="btn btn-default btn-block margin-bottom-10" href="/evenementen/thefactore-aws-cloud/participation/cancel">Afmelden</a>
+            <div class="text-muted small margin-bottom-20">
+
+              Je kunt je afmelden tot 28 sep. 2023 12:00:00
+
+            </div>
+            <div class="headline">
+              <h4>Jouw aanmelding</h4>
+            </div>
+            <dl>
+              <dt>Status</dt>
+              <dd><span class="label label-success">aangemeld</span></dd>
+            </dl>
+            <dl>
+            </dl>
+          </div> -->
+          <div class="aside-block">
+
+
+            <a class="btn btn-primary btn-block" href="/evenementen/<%= eventDetails.EventID %>/sign-up">Tickets kopen</a>
+
+            <!-- <a class="btn btn-default btn-block margin-bottom-10" href="/evenementen/<%= eventDetails.EventID %>/participation/cancel">Afmelden</a>
+            <div class="text-muted small margin-bottom-20">
+              Je kunt je bestelling annuleren tot 11 okt. 2023 12:00:00
+            </div>
+            <div class="headline">
+              <h4>Je tickets</h4>
+            </div>
+            <dl>
+              <dt>1x Bowlen - Lid</dt>
+            </dl>
+            <dl> </dl> -->
+          </div>
+          <div class="aside-block">
+            <div class="headline">
+              <h4>Over dit evenement</h4>
+            </div>
+            <dl>
+              <% if (eventDetails.EventCategoryID) { %>
+              <dt>Categorie</dt>
+              <dd><%= eventDetails.EventCategoryName  %></dd>
+              <% } %>
+              <% if (eventDetails.Organizer) { %>
+              <dt>Categorie</dt>
+              <dd><a href="/mijn-realtime/groepen/commissies/2022-2023/70072-activiteitencommissie" title="2022 - 2023 / Activiteitencommissie"><%= eventDetails.Organizer  %></a></dd>
+              <% } %>
+              <dt>Datum en tijd</dt>
+              <dd>11 okt. 2023 20:00 - 22:00</dd>
+              <% if (eventDetails.Location) { %>
+              <dt>Locatie</dt>
+              <dd><%= eventDetails.Location  %></dd>
+              <% } %>
+            </dl>
+          </div>
+        </div>
+        <div class="paragraphs col-md-9">
+          <div class="row">
+            <div class=" col-md-12 paragraph-text">
+              <%- eventDetails.Notes %>
+              <div class="headline margin-top-40">
+                <h4>Deelnemers <small>– <strong><%= attendance.reduce((n, {Tickets}) => n + Tickets, 0) %></strong><span class="small text-muted"> / <%= eventDetails.AvailableQuantity %> </span></small></h4>
+              </div>
+
+              <% if (attendance) { %>
+              <ul class="list-inline">
+                <% attendance.forEach(element => { %>
+                <li class="col-xs-12 col-sm-6 col-md-4 margin-bottom-10 truncate"> <%= element.Member %> <span class="text-muted small">(<%= element.Tickets %>x)</span> </li>
+                <% }) %>
+                <!-- <li class="col-xs-12 col-sm-6 col-md-4 margin-bottom-10 truncate"> <a href="/mijn-realtime/smoelenboek/598334">N. (Nik) van der Ree</a> <span class="text-muted small">(1x)</span> </li> -->
+              </ul>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <%- include('../includes/partners.ejs'); %>
+
+      </div>
+
+
+
+
+
+    </div>
+  </section>
+
+
+
+  <%- include('../includes/footer'); %>
+
+  <!-- generic javascript -->
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js" integrity="sha512-vO6PFSXNczuXHhdvGbOIXm67ZQlaRFjp4Wh+ARLfqPT1bVlmO1kyGrB1+7c2clk58XnsD/Cye9EJubT5B8BCgQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle2/20140216/jquery.cycle2.min.js" integrity="sha512-9pKhpjfZyETI7JvNCClrb4FN+nz9vPTvIRkIygeN5jRfMu4FQPTaePd3I2uLqOS6+hWjXJRwZHvUW+y9TUPJhw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- template javascript -->
+  <script src="/js/superfish-e25125463e3a68f85b0683f3bc21433b.js"></script>
+  <script src="/js/main-aac80d816f26db8660321cb022f841b1.js"></script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      let currentPath = window.location.pathname.split("/")[1]; // get the highest level of the path
+      let nav = document.querySelector(".header-nav");
+      let links = nav.querySelectorAll("a");
+
+      links.forEach(function(link) {
+        if (link.getAttribute("href").split("/")[1] === currentPath) {
+          link.parentElement.classList.add("path");
+        }
+      });
+    });
+  </script>
+
+
+
+
+</body>
+
+</html>

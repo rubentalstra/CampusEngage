@@ -1,74 +1,29 @@
 const { PaymentStatus } = require('@mollie/api-client');
 const mollieClient = require('../config/mollieClient');
-const { updateTransactionStatus, generateOrderID, createRefundRecord, getTransactionByMemberAndEventID, updateTransactionRefundStatus } = require('../controller/mollie/functions');
+const { createRefundRecord, getTransactionByMemberAndEventID, updateTransactionRefundStatus } = require('../controller/mollie/functions');
 const query = require('../config/database-all');
 
 
 
-async function createPayment(req, res) {
-
-    const ticketTypeId = 1;
-    // Validate request parameters, e.g. make sure ticketTypeId is provided
-    // if (!req.body.ticketTypeId) {
-    //     res.status(400).send('Missing ticket type id');
-    //     return;
-    // }
-
-    try {
-        // Query the database to get ticket type details
-        // Replace this query if your actual table and column names are different
-        const ticketTypeSql = 'SELECT * FROM Tickets WHERE TicketID = ?';
-        const ticketTypeResult = await query(ticketTypeSql, [ticketTypeId]);
-
-        if (ticketTypeResult.length === 0) {
-            res.status(404).send('Ticket type not found');
-            return;
-        }
-
-        // Extract relevant information from the ticket type
-        const ticketType = ticketTypeResult[0];
-        const amount = ticketType.Price; // make sure this is in the correct format
-        const currency = 'EUR'; // you might need to adjust this based on your requirements
-        const description = ticketType.Description;
-
-        // Generate an order ID
-        const orderId = await generateOrderID();
-
-        console.log(orderId);
-
-
-        // Insert a new transaction record into the database with status "Open"
-        const insertTransactionSql = `
- INSERT INTO Transactions (TicketID, MemberID, OrderID, Amount, Currency, Status)
- VALUES (?, ?, ?, ?, ?, 'Open');
-`;
-        await query(insertTransactionSql, [ticketTypeId, req.user.id, orderId, amount, currency]);
-
-
-        // Create a payment with Mollie API using the ticket type details
-        mollieClient.payments.create({
-            amount: { value: amount.toString(), currency },
-            description,
-            // redirectUrl: `https://localhost:8443/redirect?orderId=${orderId}`,
-            // 
-            redirectUrl: `${process.env.MOLLIE_URL}/`,
-            webhookUrl: `${process.env.MOLLIE_URL}/webhook?orderId=${orderId}`,
-            metadata: { orderId, ticketTypeId: ticketTypeId },
+function createMolliePayment(req, res, order, amount) {
+    // Create a payment with Mollie API using the ticket type details
+    mollieClient.payments.create({
+        amount: { currency: order.Currency, value: amount.toString() },
+        description: order.Description,
+        // redirectUrl: `https://localhost:8443/redirect?orderId=${orderId}`,
+        // 
+        redirectUrl: `${process.env.MOLLIE_URL}/`,
+        webhookUrl: `${process.env.MOLLIE_URL}/webhook?orderId=${order.OrderID}`,
+        metadata: { orderId: order.OrderID },
+    })
+        .then(payment => {
+            res.redirect(payment.getCheckoutUrl());
         })
-            .then(payment => {
-                res.redirect(payment.getCheckoutUrl());
-            })
-            .catch(error => {
-                // Handle errors during payment creation
-                console.error(error);
-                res.status(500).send('Error occurred while creating payment');
-            });
-
-    } catch (dbError) {
-        // Handle errors during database query
-        console.error(dbError);
-        res.status(500).send('Error occurred while fetching ticket type from database');
-    }
+        .catch(error => {
+            // Handle errors during payment creation
+            console.error(error);
+            res.status(500).send('Error occurred while creating payment');
+        });
 }
 
 
@@ -189,4 +144,4 @@ async function refundTransaction(req, res) {
 
 
 
-module.exports = { createPayment, webhookVerification, refundTransaction };
+module.exports = { createMolliePayment, webhookVerification, refundTransaction };

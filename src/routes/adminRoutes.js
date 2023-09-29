@@ -163,7 +163,7 @@ adminRouter.post('/send-password-setup', (req, res) => {
                 from: 'rubentalstra1211@outlook.com',
                 to: userEmailAddress,
                 subject: 'Set Up Your Password',
-                text: `Dear User, please click on the link to set up your password: https://localhost:8443/mijn-realtime/set-password?token=${token}`
+                text: `Dear User, please click on the link to set up your password: ${process.env.MOLLIE_URL}/mijn-realtime/set-password?token=${token}`
             };
 
             const info = await transporter.sendMail(mailOptions);

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getHomePage, getLidWordenCountriesInformation, getEvents } = require('../controller/mainController');
+const { getHomePage, getLidWordenCountriesInformation, getEvents, getAttendanceForEvent, getEventDetails } = require('../controller/mainController');
 const passportUser = require('../config/passportUsers');
 const userRouter = require('./userRoutes');
 const connection = require('../config/database');
@@ -13,6 +13,7 @@ const Page = require('../models/page');
 const sequelize = require('../config/database-pages');
 const { ensureAuthenticatedUser, userEnsure2fa } = require('../middleware/auth');
 const { webhookVerification, createPayment, refundTransaction } = require('../utilities/mollie');
+const { createOrder } = require('../utilities/order');
 
 
 
@@ -47,15 +48,30 @@ router.get('/', (req, res, next) => {
 
 
 
-router.get('/evenementen', (req, res) => {
+router.get('/evenementen', async (req, res) => {
 
-    const events = getEvents(req, res);
+    const events = await getEvents(req, res);
 
     res.render('evenementen', { user: req.user ?? undefined, events: events });
 });
 
 
-router.get('/create-payment', ensureAuthenticatedUser, userEnsure2fa, createPayment);
+router.get('/evenementen/:EventID', async (req, res) => {
+
+    const [eventDetails, attendance] = await Promise.all([getEventDetails(req, res), getAttendanceForEvent(req, res)]);
+
+    // const eventDetails = await getEventDetails(req, res);
+    // const attendance = await getAttendanceForEvent(req, res);
+
+    res.render('evenementen/details', { user: req.user ?? undefined, eventDetails: eventDetails, attendance: attendance });
+});
+
+
+router.get('/evenementen/:EventID/sign-up', ensureAuthenticatedUser, userEnsure2fa, createOrder);
+
+
+// router.get('/createOrder', ensureAuthenticatedUser, userEnsure2fa, createOrder);
+// router.get('/create-payment', ensureAuthenticatedUser, userEnsure2fa, createPayment);
 router.get('/refund', refundTransaction);
 router.post('/webhook', webhookVerification);
 // router.post('/redirect', ensureAuthenticatedUser, userEnsure2fa, webhookVerification);
@@ -274,7 +290,7 @@ router.post('/password/forgot', (req, res) => {
                 from: 'rubentalstra1211@outlook.com',
                 to: user.emailadres,
                 subject: 'Reset Your Password',
-                text: `Dear ${user.first_name}, please click on the link to set up your password: https://localhost:8443/mijn-realtime/set-password?token=${token}`
+                text: `Dear ${user.first_name}, please click on the link to set up your password: ${process.env.MOLLIE_URL}/mijn-realtime/set-password?token=${token}`
             };
 
             try {

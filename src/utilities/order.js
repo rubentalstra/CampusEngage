@@ -1,23 +1,26 @@
 const query = require('../config/database-all');
 const { generateOrderID } = require('../controller/mollie/functions');
-
-
-
-
+const { createMolliePayment } = require('./mollie');
 
 
 
 
 async function createOrder(req, res) {
+    const EventID = req.params.EventID;
+    // const EventID = 1;
 
 
     const orderId = await generateOrderID();
+    const description = await getEventDescription(EventID);
 
 
+    // Create the JSON Template here.
     const order = {
         OrderID: orderId,
         MemberID: req.user.id,
-        EventID: 1,
+        EventID: EventID,
+        Description: description,
+        Currency: 'EUR',
         OrderRows: [
             { Index: 1, TicketID: 1, MemberID: req.user.id, GuestName: null },
             { Index: 2, TicketID: 2, MemberID: null, GuestName: 'Test' },
@@ -29,12 +32,13 @@ async function createOrder(req, res) {
     await createOrderRecord(order);
 
     // after the creation of the Order we can create the Order Rows
-    await createOrderRows(order);
+    await createOrderRows(res, order);
 
-    // After this we can we can prepair the payment to be send the the mollie functions. 
-    // TODO when the payment is created the transationID needs to be in the OrderRecord (it's an INT)
+    const amount = await getTotalSumFromOrderRows(order);
 
+    await createTransation(order, amount);
 
+    return createMolliePayment(req, res, order, amount);
 }
 
 async function createOrderRecord(order) {
@@ -52,18 +56,31 @@ async function createOrderRecord(order) {
 
 
 
-async function createOrderRows(order) {
+async function createOrderRows(res, order) {
     try {
-        for (let index = 0; index < order.OrderRows.length; index++) {
-            const element = order.OrderRows[index];
+        for (const [index, element] of order.OrderRows.entries()) {
 
-            await query(
-                'INSERT INTO OrderRows (OrderID, EventID, Index, TicketID, MemberID, GuestName) VALUES (?, ?, ?, ?, ?, ?)',
-                [element.OrderID, element.EventID, index, element.TicketID, element.MemberID, element.GuestName]
-            );
-            continue;
+            // Insert OrderRow into the database
+            const insertSql = 'INSERT INTO OrderRows (OrderRows.OrderID, OrderRows.Index, OrderRows.TicketID, OrderRows.MemberID, OrderRows.GuestName) VALUES (?, ?, ?, ?, ?)';
+            await query(insertSql, [order.OrderID, index, element.TicketID, element.MemberID, element.GuestName]);
+
         }
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+        console.error(error);
         return;
+    }
+}
+
+
+
+async function getTotalSumFromOrderRows(order) {
+    try {
+        const totalSum = await query(`
+        SELECT SUM(Tickets.Price) AS 'amount' FROM OrderRows 
+        LEFT JOIN Tickets ON OrderRows.TicketID = Tickets.TicketID
+        WHERE OrderID = ?`, [order.OrderID]);
+        return totalSum[0].amount;  // return event data
     } catch (error) {
         console.error(error);
         return null;
@@ -71,23 +88,12 @@ async function createOrderRows(order) {
 }
 
 
-
-
-async function createTransation(transactionID, refundPaymentID, amount, RefundStatus) {
+async function createTransation(order, amount) {
     try {
-
-
-        // Extract relevant information from the ticket type
-        const ticketType = ticketTypeResult[0];
-        const amount = ticketType.Price; // make sure this is in the correct format
-        const currency = 'EUR'; // you might need to adjust this based on your requirements
-        const description = ticketType.Description;
-
-
-        const result = await query(`INSERT INTO Transactions (TicketID, MemberID, OrderID, Amount, Currency, Status) VALUES (?, ?, ?, ?, ?, 'Open')`,
-            [transactionID, orderId, refundPaymentID, amount, RefundStatus]
+        await query(`INSERT INTO Transactions (OrderID, MemberID, Amount, Currency, Status) VALUES (?, ?, ?, ?, 'Open')`,
+            [order.OrderID, order.MemberID, amount, order.Currency]
         );
-        return result.insertId;  // return ID of the new record
+        return;  // return ID of the new record
     } catch (error) {
         console.error(error);
         return null;
@@ -95,43 +101,15 @@ async function createTransation(transactionID, refundPaymentID, amount, RefundSt
 }
 
 
-async function createTransation(order) {
+async function getEventDescription(EventID) {
     try {
-
-
-        // Extract relevant information from the ticket type
-        const ticketType = ticketTypeResult[0];
-        const amount = ticketType.Price; // make sure this is in the correct format
-        const currency = 'EUR'; // you might need to adjust this based on your requirements
-        const description = ticketType.Description;
-
-        // Generate an order ID
-        const orderId = await generateOrderID();
-
-        console.log(orderId);
-
-
-        // Insert a new transaction record into the database with status "Open"
-        const insertTransactionSql = `
-         INSERT INTO Transactions (TicketID, MemberID, OrderID, Amount, Currency, Status)
-         VALUES (?, ?, ?, ?, ?, 'Open');
-        `;
-        await query(insertTransactionSql, [ticketTypeId, req.user.id, orderId, amount, currency]);
-
-
-
-        for (let index = 0; index < order.OrderRows.length; index++) {
-            const element = order.OrderRows[index];
-
-            await query(
-                'INSERT INTO OrderRows (OrderID, EventID, Index, TicketID, MemberID, GuestName) VALUES (?, ?, ?, ?, ?, ?)',
-                [element.OrderID, element.EventID, index, element.TicketID, element.MemberID, element.GuestName]
-            );
-            continue;
-        }
-        return;
+        const result = await query(`SELECT Events.Name AS 'Description' from Events where Events.EventID = ?`, [EventID]);
+        return result[0].Description;  // return event data
     } catch (error) {
         console.error(error);
         return null;
     }
 }
+
+
+module.exports = { createOrder };
