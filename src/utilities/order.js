@@ -3,42 +3,50 @@ const { generateOrderID } = require('../controller/mollie/functions');
 const { createMolliePayment } = require('./mollie');
 
 
-
-
 async function createOrder(req, res) {
-    const EventID = req.params.EventID;
-    // const EventID = 1;
+    try {
+        const EventID = req.params.EventID;
 
+        if (!EventID) {
+            return res.status(400).send('EventID is required');
+        }
 
-    const orderId = await generateOrderID();
-    const description = await getEventDescription(EventID);
+        const orderId = await generateOrderID();
+        const description = await getEventDescription(EventID);
 
+        if (!description) {
+            return res.status(404).send('Event not found');
+        }
 
-    // Create the JSON Template here.
-    const order = {
-        OrderID: orderId,
-        MemberID: req.user.id,
-        EventID: EventID,
-        Description: description,
-        Currency: 'EUR',
-        OrderRows: [
-            { Index: 1, TicketID: 1, MemberID: req.user.id, GuestName: null },
-            { Index: 2, TicketID: 2, MemberID: null, GuestName: 'Test' },
-            { Index: 3, TicketID: 2, MemberID: null, GuestName: 'Test' },
-        ]
-    };
+        const order = {
+            OrderID: orderId,
+            MemberID: req.user.id,
+            EventID: EventID,
+            Description: description,
+            Currency: 'EUR',
+            OrderRows: [
+                // Dummy data, replace with actual order rows
+                { Index: 1, TicketID: 1, MemberID: req.user.id, GuestName: null },
+                { Index: 2, TicketID: 2, MemberID: null, GuestName: 'Test' },
+                { Index: 3, TicketID: 2, MemberID: null, GuestName: 'Test' },
+            ]
+        };
 
-    // First Create the Main Order
-    await createOrderRecord(order);
+        await createOrderRecord(order);
+        await createOrderRows(order, res);
+        const amount = await getTotalSumFromOrderRows(order);
 
-    // after the creation of the Order we can create the Order Rows
-    await createOrderRows(res, order);
+        if (amount == null) {
+            // If the amount is 0 then we send a email for entering a free event.
+            return res.status(500).send('Error calculating total order amount');
+        }
 
-    const amount = await getTotalSumFromOrderRows(order);
-
-    await createTransation(order, amount);
-
-    return createMolliePayment(req, res, order, amount);
+        await createTransaction(order, amount);
+        return createMolliePayment(order, amount, req, res);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Internal Server Error');
+    }
 }
 
 async function createOrderRecord(order) {
@@ -56,14 +64,12 @@ async function createOrderRecord(order) {
 
 
 
-async function createOrderRows(res, order) {
+async function createOrderRows(order, res) {
     try {
         for (const [index, element] of order.OrderRows.entries()) {
-
             // Insert OrderRow into the database
             const insertSql = 'INSERT INTO OrderRows (OrderRows.OrderID, OrderRows.Index, OrderRows.TicketID, OrderRows.MemberID, OrderRows.GuestName) VALUES (?, ?, ?, ?, ?)';
             await query(insertSql, [order.OrderID, index, element.TicketID, element.MemberID, element.GuestName]);
-
         }
     } catch (error) {
         res.status(500).send('Internal Server Error');
@@ -88,7 +94,7 @@ async function getTotalSumFromOrderRows(order) {
 }
 
 
-async function createTransation(order, amount) {
+async function createTransaction(order, amount) {
     try {
         await query(`INSERT INTO Transactions (OrderID, MemberID, Amount, Currency, Status) VALUES (?, ?, ?, ?, 'Open')`,
             [order.OrderID, order.MemberID, amount, order.Currency]

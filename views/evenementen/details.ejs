@@ -66,20 +66,22 @@
           </div> -->
           <div class="aside-block">
 
-
+            <% if (!cancelDate) { %>
             <a class="btn btn-primary btn-block" href="/evenementen/<%= eventDetails.EventID %>/sign-up">Tickets kopen</a>
-
-            <!-- <a class="btn btn-default btn-block margin-bottom-10" href="/evenementen/<%= eventDetails.EventID %>/participation/cancel">Afmelden</a>
+            <% } else  { %>
+            <a class="btn btn-default btn-block margin-bottom-10" href="/evenementen/<%= eventDetails.EventID %>/participation/cancel">Afmelden</a>
             <div class="text-muted small margin-bottom-20">
-              Je kunt je bestelling annuleren tot 11 okt. 2023 12:00:00
+              Je kunt je bestelling annuleren tot <%= cancelDate.CancelableUntil %>
             </div>
-            <div class="headline">
+            <% } %>
+
+            <!-- <div class="headline">
               <h4>Je tickets</h4>
             </div>
-            <dl>
+            <dl> 
               <dt>1x Bowlen - Lid</dt>
             </dl>
-            <dl> </dl> -->
+            <dl> </dl>  -->
           </div>
           <div class="aside-block">
             <div class="headline">

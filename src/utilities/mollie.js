@@ -3,15 +3,20 @@ const mollieClient = require('../config/mollieClient');
 const { createRefundRecord, getTransactionByMemberAndEventID, updateTransactionRefundStatus } = require('../controller/mollie/functions');
 const query = require('../config/database-all');
 
+async function updateTransactionStatus(status, mollieId, orderId, res) {
+    try {
+        await query('UPDATE Transactions SET Status = ?, MollieID = ? WHERE OrderID = ?', [status, mollieId, orderId]);
+        return;
+    } catch (dbError) {
+        console.error(dbError);
+        res.status(500).send('Error occurred while updating payment status in database');
+    }
+}
 
-
-function createMolliePayment(req, res, order, amount) {
-    // Create a payment with Mollie API using the ticket type details
+function createMolliePayment(order, amount, req, res) {
     mollieClient.payments.create({
         amount: { currency: order.Currency, value: amount.toString() },
         description: order.Description,
-        // redirectUrl: `https://localhost:8443/redirect?orderId=${orderId}`,
-        // 
         redirectUrl: `${process.env.MOLLIE_URL}/`,
         webhookUrl: `${process.env.MOLLIE_URL}/webhook?orderId=${order.OrderID}`,
         metadata: { orderId: order.OrderID },
@@ -20,128 +25,61 @@ function createMolliePayment(req, res, order, amount) {
             res.redirect(payment.getCheckoutUrl());
         })
         .catch(error => {
-            // Handle errors during payment creation
             console.error(error);
             res.status(500).send('Error occurred while creating payment');
         });
 }
 
-
 function webhookVerification(req, res) {
-
-    // Make sure you validate req.body.id before using it to avoid security risks
     if (!req.body.id) {
-        res.status(400).send('Missing payment id');
-        return;
+        return res.status(400).send('Missing payment id');
     }
 
     mollieClient.payments.get(req.body.id)
         .then(async payment => {
-            // Check if the payment is paid
-            if (payment.status == PaymentStatus.paid) {
-                // Hooray, you've received a payment! You can start shipping to the consumer.
-
-                // console.log(payment.id);
-                // console.log(orderID);
-                // Update status in database
-                try {
-                    await query('UPDATE Transactions SET Status = ?, MollieID = ? WHERE OrderID = ?', ['Paid', req.body.id, req.query.orderId]);
-                    res.send('Payment is paid and status updated in database');
-                } catch (dbError) {
-                    console.error(dbError);
-                    res.status(500).send('Error occurred while updating payment status in database');
-                }
-            } else if (payment.status == PaymentStatus.canceled) {
-                // Payment is canceled by the customer
-                // Update status in database
-                try {
-                    await query('UPDATE Transactions SET Status = ?, MollieID = ? WHERE OrderID = ?', ['Canceled', req.body.id, req.query.orderId]);
-                    res.send('Payment is canceled and status updated in database');
-                } catch (dbError) {
-                    console.error(dbError);
-                    res.status(500).send('Error occurred while updating payment status in database');
-                }
-            } else if (payment.status != PaymentStatus.open) {
-                // The payment isn't paid, isn't open, and isn't canceled. We can assume it was aborted or failed.
-                // Update status in database
-                try {
-                    await query('UPDATE Transactions SET Status = ?, MollieID = ? WHERE OrderID = ?', ['Failed', req.body.id, req.query.orderId]);
-                    res.send('Payment is not open, not paid, not canceled, and status updated in database');
-                } catch (dbError) {
-                    console.error(dbError);
-                    res.status(500).send('Error occurred while updating payment status in database');
-                }
-            } else {
-                // Payment is still open
-                // You might want to update the status in the database here as well, depending on your requirements
-                res.send('Payment is still open');
+            switch (payment.status) {
+                case PaymentStatus.paid:
+                    return updateTransactionStatus('Paid', req.body.id, req.query.orderId, res);
+                case PaymentStatus.canceled:
+                    return updateTransactionStatus('Canceled', req.body.id, req.query.orderId, res);
+                default:
+                    if (payment.status != PaymentStatus.open) {
+                        return updateTransactionStatus('Failed', req.body.id, req.query.orderId, res);
+                    }
+                    res.send('Payment is still open');
             }
         })
         .catch(error => {
-            // Do some proper error handling.
             console.error(error);
             res.status(500).send('Error occurred while verifying payment');
         });
 }
 
-
 async function refundTransaction(req, res) {
     try {
-        const memberId = req.user.id;
+        const transaction = await getTransactionByMemberAndEventID(req.user.id, req.params.OrderID);
 
-        const eventID = 1;
-        // const eventID = req.body.eventID;
-
-        // Step 1: Retrieve transaction and ticket type details in a single query
-        const transaction = await getTransactionByMemberAndEventID(memberId, eventID);
-        if (!transaction || transaction.Status !== 'Paid') {
-            return res.status(404).send('Eligible transaction not found');
+        console.log(transaction);
+        if (!transaction || new Date() > new Date(transaction.CancelableUntil)) {
+            return res.status(400).send('Eligible transaction not found or refund request deadline has passed');
         }
 
-        // Step 2: Check CancelableUntil
-        const currentDate = new Date();
-        if (currentDate > new Date(transaction.CancelableUntil)) {
-            return res.status(400).send('Refund request deadline has passed');
-        }
-
-        // console.log(transaction.MollieID);
-
-        // Step 3: Proceed with refund if all checks pass
         const refund = await mollieClient.paymentRefunds.create({
             paymentId: transaction.MollieID,
-            amount: {
-                value: transaction.Amount.toString(),
-                currency: 'EUR'  // Ensure correct currency
-            }
+            amount: { value: transaction.Amount.toString(), currency: 'EUR' }
         });
 
-        // console.log(refund);
-
-        // Step 5: Update records in database if refund is successful
-        if (refund && refund.status === 'refunded') {
-            await createRefundRecord(transaction.TransactionID, refund.id, refund.amount.value, 'Refunded');
-            await updateTransactionRefundStatus(transaction.TransactionID, 'Refunded');
-            return res.send('Refund successful');
-        } else if (refund && refund.status === 'pending') {
-            await createRefundRecord(transaction.TransactionID, refund.id, refund.amount.value, 'Pending');
-            await updateTransactionRefundStatus(transaction.TransactionID, 'Pending');
-            return res.send('Refund is Pending');
-        } else if (refund && refund.status === 'failed') {
-            await createRefundRecord(transaction.TransactionID, refund.id, refund.amount.value, 'Failed');
-            await updateTransactionRefundStatus(transaction.TransactionID, 'Failed');
-            return res.send('Refund is Pending');
-        } else {
-            return res.status(400).send('Refund failed');
+        if (refund) {
+            await createRefundRecord(transaction.TransactionID, refund.id, refund.amount.value, refund.status);
+            await updateTransactionRefundStatus(transaction.TransactionID, refund.status);
+            return res.send(`Refund ${refund.status}`);
         }
 
+        res.status(400).send('Refund failed');
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
 }
-
-
-
-
 
 module.exports = { createMolliePayment, webhookVerification, refundTransaction };

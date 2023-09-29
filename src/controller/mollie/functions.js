@@ -7,10 +7,15 @@ const query = require('../../config/database-all');
 async function getTransactionByMemberAndEventID(memberId, eventId) {
     try {
         const transactions = await query(
-            `SELECT Transactions.*, TicketTypes.CancelableUntil 
-             FROM Transactions 
-             JOIN TicketTypes ON Transactions.TicketTypeID = TicketTypes.TicketTypeID
-             WHERE Transactions.MemberID = ? AND TicketTypes.EventID = ? AND Transactions.Status = 'Paid'`,
+            `SELECT t.CancelableUntil, tr.TransactionID, tr.Status, tr.Amount, tr.MollieID
+            FROM Tickets t
+            JOIN OrderRows orr ON t.TicketID = orr.TicketID
+            JOIN Orders o ON orr.OrderID = o.OrderID
+            JOIN Transactions tr ON o.OrderID = tr.OrderID AND o.MemberID = tr.MemberID
+            WHERE o.MemberID = 'd25bff46-5b13-11ee-89e1-4ac5fc9f2af2'
+            AND t.EventID = 1
+            AND tr.Status = 'Paid'
+            AND orr.MemberID IS NOT NULL`,
             [memberId, eventId]
         );
         return transactions[0];  // return first matching record

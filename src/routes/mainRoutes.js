@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getHomePage, getLidWordenCountriesInformation, getEvents, getAttendanceForEvent, getEventDetails } = require('../controller/mainController');
+const { getHomePage, getLidWordenCountriesInformation, getEvents, getAttendanceForEvent, getEventDetails, getIfUserHasBoughtTicket } = require('../controller/mainController');
 const passportUser = require('../config/passportUsers');
 const userRouter = require('./userRoutes');
 const connection = require('../config/database');
@@ -48,7 +48,7 @@ router.get('/', (req, res, next) => {
 
 
 
-router.get('/evenementen', async (req, res) => {
+router.get('/evenementen', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
 
     const events = await getEvents(req, res);
 
@@ -56,18 +56,17 @@ router.get('/evenementen', async (req, res) => {
 });
 
 
-router.get('/evenementen/:EventID', async (req, res) => {
+router.get('/evenementen/:EventID', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
 
-    const [eventDetails, attendance] = await Promise.all([getEventDetails(req, res), getAttendanceForEvent(req, res)]);
+    const [eventDetails, attendance, CancelableUntil] = await Promise.all([getEventDetails(req, res), getAttendanceForEvent(req, res), getIfUserHasBoughtTicket(req, res)]);
 
-    // const eventDetails = await getEventDetails(req, res);
-    // const attendance = await getAttendanceForEvent(req, res);
 
-    res.render('evenementen/details', { user: req.user ?? undefined, eventDetails: eventDetails, attendance: attendance });
+    res.render('evenementen/details', { user: req.user ?? undefined, eventDetails: eventDetails, attendance: attendance, cancelDate: CancelableUntil });
 });
 
 
 router.get('/evenementen/:EventID/sign-up', ensureAuthenticatedUser, userEnsure2fa, createOrder);
+router.get('/evenementen/:EventID/participation/cancel', ensureAuthenticatedUser, userEnsure2fa, refundTransaction);
 
 
 // router.get('/createOrder', ensureAuthenticatedUser, userEnsure2fa, createOrder);
