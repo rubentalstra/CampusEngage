@@ -16,7 +16,7 @@ const userRouter = express.Router();
 
 
 userRouter.get('/user-dashboard', ensureAuthenticatedUser, userEnsure2fa, (req, res, next) => {
-    res.render('mijn-realtime/user-dashboard', { user: req.user });
+    res.render('mijn-realtime/user-dashboard', { nonce: res.locals.cspNonce, user: req.user });
 });
 
 
@@ -25,7 +25,7 @@ userRouter.get('/user-dashboard', ensureAuthenticatedUser, userEnsure2fa, (req, 
 userRouter.get('/set-password', (req, res) => {
     const token = req.query.token;
     // Render the password setting form page, passing the token along
-    res.render('mijn-realtime/set-password', { token: token });
+    res.render('mijn-realtime/set-password', { nonce: res.locals.cspNonce, token: token });
 });
 
 
@@ -71,18 +71,21 @@ userRouter.post('/set-password', (req, res) => {
 
 userRouter.get('/profiel/2fa', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
     res.render('mijn-realtime/2fa', {
+        nonce: res.locals.cspNonce,
         user: req.user,
     });
 });
 
 userRouter.get('/uitschrijven', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
     res.render('mijn-realtime/uitschrijven', {
+        nonce: res.locals.cspNonce,
         user: req.user,
     });
 });
 
 userRouter.get('/agenda', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
     res.render('mijn-realtime/agenda', {
+        nonce: res.locals.cspNonce,
         user: req.user,
     });
 });
@@ -109,6 +112,7 @@ userRouter.get('/profiel', ensureAuthenticatedUser, userEnsure2fa, (req, res) =>
         if (results.length) {
             const user = results[0];
             res.render('mijn-realtime/profiel', {
+                nonce: res.locals.cspNonce,
                 user: req.user,
                 imagePath: user.imagePath
             });
@@ -224,8 +228,8 @@ userRouter.get('/setup-2fa', ensureAuthenticatedUser, (req, res) => {
     // Generate a QR Code for the user to scan
 
     qrcode.toDataURL(key.url, (err, dataUrl) => {
-        if (err) { return res.render('mijn-realtime/2fa/setup-2fa', { user: req.user, qrCode: dataUrl, secret: null, error: 'Some error message here' }); }
-        res.render('mijn-realtime/2fa/setup-2fa', { user: req.user, qrCode: dataUrl, secret: key.secret });
+        if (err) { return res.render('mijn-realtime/2fa/setup-2fa', { nonce: res.locals.cspNonce, user: req.user, qrCode: dataUrl, secret: null, error: 'Some error message here' }); }
+        res.render('mijn-realtime/2fa/setup-2fa', { nonce: res.locals.cspNonce, user: req.user, qrCode: dataUrl, secret: key.secret });
     });
 });
 
@@ -252,7 +256,7 @@ userRouter.post('/verify-2fa', ensureAuthenticatedUser, (req, res) => {
 userRouter.get('/prompt-2fa', ensureAuthenticatedUser, (req, res, next) => {
     if (!req.user.hasFA) { return res.redirect('/mijn-realtime/profiel'); }
     if (req.session.is2faVerified) { return res.redirect('/mijn-realtime/profiel'); }
-    return res.render('mijn-realtime/2fa/prompt-2fa', { user: undefined });
+    return res.render('mijn-realtime/2fa/prompt-2fa', { nonce: res.locals.cspNonce, user: undefined });
 });
 
 
@@ -272,9 +276,9 @@ userRouter.post('/check-2fa', ensureAuthenticatedUser, (req, res) => {
                 return res.redirect('/mijn-realtime/profiel');
             }
 
-            res.render('mijn-realtime/2fa/prompt-2fa', { user: undefined, error: 'Invalid token. Please try again.' });
+            res.render('mijn-realtime/2fa/prompt-2fa', { nonce: res.locals.cspNonce, user: undefined, error: 'Invalid token. Please try again.' });
         } catch (error) {
-            res.render('mijn-realtime/2fa/prompt-2fa', { user: undefined, error: 'Invalid token. Please try again.' });
+            res.render('mijn-realtime/2fa/prompt-2fa', { nonce: res.locals.cspNonce, user: undefined, error: 'Invalid token. Please try again.' });
         }
     });
 });
@@ -283,7 +287,7 @@ userRouter.post('/check-2fa', ensureAuthenticatedUser, (req, res) => {
 // remove 2FA
 
 userRouter.get('/remove-2fa', ensureAuthenticatedUser, (req, res) => {
-    res.render('mijn-realtime/2fa/prompt-remove-2fa');  // This should be a view where the user inputs their current 2FA code to remove it
+    res.render('mijn-realtime/2fa/prompt-remove-2fa', { nonce: res.locals.cspNonce });  // This should be a view where the user inputs their current 2FA code to remove it
 });
 
 
@@ -304,7 +308,7 @@ userRouter.post('/confirm-remove-2fa', ensureAuthenticatedUser, (req, res) => {
                 res.send('2FA removed successfully');
             });
         } else {
-            res.render('mijn-realtime/2fa/prompt-remove-2fa', { error: 'Invalid token. Please try again.' });
+            res.render('mijn-realtime/2fa/prompt-remove-2fa', { nonce: res.locals.cspNonce, error: 'Invalid token. Please try again.' });
         }
     });
 });

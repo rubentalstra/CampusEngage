@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>RealTime - Evenementen</title>
+
+  <%- include('../includes/meta', {}); %>
+
+  <%- include('../includes/headLink', {}); %>
+
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" /> -->
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script> -->
+
+
+
+  <style>
+    .content-header-background {
+      background-image: url('/img/banners/9094706bfd344c3cbbbffcc6d7fe3d0a-lg.png');
+    }
+  </style>
+</head>
+
+<body class="template-content webpage-5437 module-profile authenticated-user">
+
+  <%- include('../includes/header', {user: user}); %>
+
+  <section id="content">
+    <div class="content-header content-header-background">
+      <div class="container">
+        <ol class="breadcrumb">
+          <li><a href="/evenementen">Evenementen</a></li>
+          <li class="active">Kalender</li>
+        </ol>
+        <h2>Evenementen</h2>
+      </div>
+    </div>
+    <div class="container">
+
+      <div class="row">
+        <div class="aside col-md-3">
+          <ul id="submenu">
+            <li><a href="/evenementen" title="">Evenementen</a>
+              <ul>
+                <li><a href="/evenementen" title="">Binnenkort</a>
+                </li>
+                <li class="active"><a href="/evenementen/calendar" title="">Kalender</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div class="paragraphs col-md-9">
+          <div id="events-calendar" class="fc fc-unthemed fc-ltr">
+
+
+          </div>
+
+          <!-- <p>
+                <br>
+                <a href="/_ical/db1e387a-b9fb-48ea-831c-447ed1166fc7.ics" target="_blank">Voeg evenementen toe aan je agenda met deze persoonlijke link (.ics)</a>
+            </p> -->
+        </div>
+
+
+
+        <%- include('../includes/partners.ejs'); %>
+
+
+      </div>
+
+
+    </div>
+  </section>
+
+
+
+  <%- include('../includes/footer'); %>
+
+  <!-- generic javascript -->
+
+  <script src="/js/dist/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/jquery.cycle2.min.js"></script>
+
+  <!-- template javascript -->
+  <script src="/js/superfish-e25125463e3a68f85b0683f3bc21433b.js"></script>
+  <script src="/js/main-aac80d816f26db8660321cb022f841b1.js"></script>
+
+
+  <script src="/js/core/index.global.min.js"></script>
+  <script src="/js/daygrid/index.global.min.js"></script>
+
+
+  <script src="/js/core/locales/nl.js"></script>
+
+
+
+
+  <script nonce="<%= nonce %>">
+    document.addEventListener("DOMContentLoaded", function() {
+      let currentPath = window.location.pathname.split("/")[1]; // get the highest level of the path
+      let nav = document.querySelector(".header-nav");
+      let links = nav.querySelectorAll("a");
+
+      links.forEach(function(link) {
+        if (link.getAttribute("href").split("/")[1] === currentPath) {
+          link.parentElement.classList.add("path");
+        }
+      });
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var calendarEl = document.getElementById('events-calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: '/evenementen/calendar/json'
+      });
+      calendar.render();
+    });
+
+    // $(document).ready(function() {
+    //   $('#events-calendar').fullCalendar({
+    //     header: {
+    //       left: 'prev,next today',
+    //       center: 'title',
+    //       right: 'month,agendaWeek,agendaDay'
+    //     },
+    //     locale: 'nl',
+    //     timeFormat: 'H:mm',
+    //     defaultDate: '2023-09-30',
+    //     defaultView: 'month',
+    //     weekends: true,
+    //     minTime: '00:00:00',
+    //     maxTime: '24:00:00',
+    //     contentHeight: 'auto',
+    //     allDaySlot: true,
+    //     events: '/evenementen/calendar/json'
+    //   });
+    // });
+  </script>
+
+
+
+
+</body>
+
+</html>

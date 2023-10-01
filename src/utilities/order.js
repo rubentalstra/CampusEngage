@@ -24,17 +24,16 @@ async function createOrder(req, res) {
             EventID: EventID,
             Description: description,
             Currency: 'EUR',
-            OrderRows: [
-                // Dummy data, replace with actual order rows
-                { Index: 1, TicketID: 1, MemberID: req.user.id, GuestName: null },
-                { Index: 2, TicketID: 2, MemberID: null, GuestName: 'Test' },
-                { Index: 3, TicketID: 2, MemberID: null, GuestName: 'Test' },
+            Attendees: [
+                { TicketID: 1, BuyerID: req.user.id, GuestName: null },
+                { TicketID: 2, BuyerID: req.user.id, GuestName: 'Test' },
+                { TicketID: 2, BuyerID: req.user.id, GuestName: 'Test' },
             ]
         };
 
         await createOrderRecord(order);
-        await createOrderRows(order, res);
-        const amount = await getTotalSumFromOrderRows(order);
+        await createAttendees(order, res);
+        const amount = await getTotalSumFromAttendees(order);
 
         if (amount == null) {
             // If the amount is 0 then we send a email for entering a free event.
@@ -64,12 +63,11 @@ async function createOrderRecord(order) {
 
 
 
-async function createOrderRows(order, res) {
+async function createAttendees(order, res) {
     try {
-        for (const [index, element] of order.OrderRows.entries()) {
-            // Insert OrderRow into the database
-            const insertSql = 'INSERT INTO OrderRows (OrderRows.OrderID, OrderRows.Index, OrderRows.TicketID, OrderRows.MemberID, OrderRows.GuestName) VALUES (?, ?, ?, ?, ?)';
-            await query(insertSql, [order.OrderID, index, element.TicketID, element.MemberID, element.GuestName]);
+        for (const attendee of order.Attendees) {
+            const insertSql = 'INSERT INTO Attendees (OrderID, TicketID, BuyerID, GuestName) VALUES (?, ?, ?, ?)';
+            await query(insertSql, [order.OrderID, attendee.TicketID, attendee.BuyerID, attendee.GuestName]);
         }
     } catch (error) {
         res.status(500).send('Internal Server Error');
@@ -79,14 +77,13 @@ async function createOrderRows(order, res) {
 }
 
 
-
-async function getTotalSumFromOrderRows(order) {
+async function getTotalSumFromAttendees(order) {
     try {
         const totalSum = await query(`
-        SELECT SUM(Tickets.Price) AS 'amount' FROM OrderRows 
-        LEFT JOIN Tickets ON OrderRows.TicketID = Tickets.TicketID
+        SELECT SUM(Tickets.Price) AS 'amount' FROM Attendees 
+        LEFT JOIN Tickets ON Attendees.TicketID = Tickets.TicketID
         WHERE OrderID = ?`, [order.OrderID]);
-        return totalSum[0].amount;  // return event data
+        return totalSum[0].amount;
     } catch (error) {
         console.error(error);
         return null;

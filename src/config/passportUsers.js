@@ -37,12 +37,12 @@ const strategy = new LocalStrategy(customFields, verifyCallback);
 passportUser.use('local-user', strategy);
 
 passportUser.serializeUser((user, done) => {
-    console.log('inside serialize');
+    // console.log('inside serialize');
     done(null, user.id);
 });
 
 passportUser.deserializeUser(function (userId, done) {
-    console.log('deserializeUser ' + userId);
+    // console.log('deserializeUser ' + userId);
     connection.query('SELECT id, first_name, primary_last_name_main, emailadres, hasFA FROM Members where id = ?', [userId], function (error, results) {
         if (error) { return console.log(error.sqlMessage); }
         if (results && results.length && results[0]) {

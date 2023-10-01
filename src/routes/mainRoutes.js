@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getHomePage, getLidWordenCountriesInformation, getEvents, getAttendanceForEvent, getEventDetails, getIfUserHasBoughtTicket } = require('../controller/mainController');
+const { getHomePage, getLidWordenCountriesInformation, getEvents, getAttendanceForEvent, getEventDetails, getIfUserHasBoughtTicket, getMyTicketsForEvent } = require('../controller/mainController');
 const passportUser = require('../config/passportUsers');
 const userRouter = require('./userRoutes');
 const connection = require('../config/database');
@@ -10,10 +10,15 @@ const { updatePdfFields } = require('../middleware/pdf');
 const { convertToMySQLDate } = require('../middleware/utils');
 const { v4: uuidv4 } = require('uuid'); // Ensure you have the 'uuid' package installed
 const Page = require('../models/page');
+
+const path = require('path');
+const fs = require('fs');
+
 const sequelize = require('../config/database-pages');
 const { ensureAuthenticatedUser, userEnsure2fa } = require('../middleware/auth');
-const { webhookVerification, createPayment, refundTransaction } = require('../utilities/mollie');
+const { webhookVerification, createRefundPayment, } = require('../utilities/mollie');
 const { createOrder } = require('../utilities/order');
+const { getCalendarJson } = require('../controller/user/api');
 
 
 
@@ -33,7 +38,7 @@ router.use((req, res, next) => {
             return;  // This is crucial, as you don't want any code after this block to run if a session is hijacked
         });
     } else {
-        console.log(req.session);
+        // console.log(req.session);
         console.log(req.user);
         req.session.userType = 'user';
         next(); // Proceed to the next middleware or route handler
@@ -43,7 +48,14 @@ router.use((req, res, next) => {
 
 
 router.get('/', (req, res, next) => {
-    res.render('index', { user: req.user });
+    res.render('index', { nonce: res.locals.cspNonce, user: req.user });
+});
+
+
+
+router.get('/sponsors/:imageName', (req, res) => {
+    const imageName = req.params.imageName;
+    return res.sendFile(path.join(__dirname, '../../uploads/sponsors/', path.basename(imageName)));
 });
 
 
@@ -52,8 +64,17 @@ router.get('/evenementen', ensureAuthenticatedUser, userEnsure2fa, async (req, r
 
     const events = await getEvents(req, res);
 
-    res.render('evenementen', { user: req.user ?? undefined, events: events });
+    res.render('evenementen', { nonce: res.locals.cspNonce, user: req.user ?? undefined, events: events });
 });
+
+
+router.get('/evenementen/calendar', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
+    res.render('evenementen/calendar', { nonce: res.locals.cspNonce, user: req.user ?? undefined });
+});
+
+
+router.get('/evenementen/calendar/json', ensureAuthenticatedUser, userEnsure2fa, getCalendarJson);
+
 
 
 router.get('/evenementen/:EventID', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
@@ -61,24 +82,36 @@ router.get('/evenementen/:EventID', ensureAuthenticatedUser, userEnsure2fa, asyn
     const [eventDetails, attendance, CancelableUntil] = await Promise.all([getEventDetails(req, res), getAttendanceForEvent(req, res), getIfUserHasBoughtTicket(req, res)]);
 
 
-    res.render('evenementen/details', { user: req.user ?? undefined, eventDetails: eventDetails, attendance: attendance, cancelDate: CancelableUntil });
+    res.render('evenementen/details', { nonce: res.locals.cspNonce, user: req.user ?? undefined, eventDetails: eventDetails, attendance: attendance, cancelDate: CancelableUntil });
 });
 
 
 router.get('/evenementen/:EventID/sign-up', ensureAuthenticatedUser, userEnsure2fa, createOrder);
-router.get('/evenementen/:EventID/participation/cancel', ensureAuthenticatedUser, userEnsure2fa, refundTransaction);
+
+router.get('/evenementen/:EventID/participation/cancel', async (req, res) => {
+    // Replace the following with actual data retrieval logic from your database
+
+
+    const attendees = await getMyTicketsForEvent(req, res);
+
+    // console.log(attendees);
+
+    res.render('evenementen/tickets', { nonce: res.locals.cspNonce, user: req.user ?? undefined, attendees: attendees, EventID: req.params.EventID });
+});
+
+router.post('/evenementen/:EventID/participation/cancel', ensureAuthenticatedUser, userEnsure2fa, createRefundPayment);
 
 
 // router.get('/createOrder', ensureAuthenticatedUser, userEnsure2fa, createOrder);
 // router.get('/create-payment', ensureAuthenticatedUser, userEnsure2fa, createPayment);
-router.get('/refund', refundTransaction);
+// router.get('/refund', createRefundPayment);
 router.post('/webhook', webhookVerification);
 // router.post('/redirect', ensureAuthenticatedUser, userEnsure2fa, webhookVerification);
 
 
 
 router.get('/contact', (req, res, next) => {
-    res.render('contact', { user: req.user });
+    res.render('contact', { nonce: res.locals.cspNonce, user: req.user });
 });
 
 router.use('/mijn-realtime', userRouter);
@@ -96,6 +129,7 @@ router.get('/lid-worden', (req, res) => {
         }
 
         res.render('lid-worden/lid-worden', {
+            nonce: res.locals.cspNonce,
             user: undefined,
             countries: countries
         });
@@ -110,7 +144,7 @@ router.get('/create', async (req, res) => {
         const parentPages = await Page.findAll();
 
         // Render the form
-        res.render('page-create', { parentPages });
+        res.render('page-create', { nonce: res.locals.cspNonce, parentPages });
     } catch (error) {
         console.error('Error fetching parent pages:', error);
         res.status(500).send('Server error');
@@ -157,7 +191,7 @@ router.get('/page/*', async (req, res) => {
         return res.status(404).send('Page not found');
     }
 
-    res.render('layout', { page, pages });
+    res.render('layout', { nonce: res.locals.cspNonce, page, pages });
 });
 
 // END test create pages
@@ -222,7 +256,7 @@ router.post('/lid-worden/personalia', (req, res) => {
 
 
 router.get('/login', (req, res, next) => {
-    res.render('login', { user: undefined });
+    res.render('login', { nonce: res.locals.cspNonce, user: undefined });
 });
 
 // Adjusting the login success route:
@@ -253,7 +287,7 @@ router.get('/logout', (req, res, next) => {
 });
 
 router.get('/password/forgot', (req, res) => {
-    res.render('reset-password', { user: undefined });
+    res.render('reset-password', { nonce: res.locals.cspNonce, user: undefined });
 });
 
 router.post('/password/forgot', (req, res) => {
@@ -308,7 +342,7 @@ router.post('/password/forgot', (req, res) => {
 
 router.get('/register', (req, res, next) => {
     console.log('Inside get');
-    res.render('register');
+    res.render('register', { nonce: res.locals.cspNonce });
 
 });
 
@@ -363,7 +397,7 @@ router.post('/register', (req, res) => {
 });
 
 router.get('/pending-approval', (req, res) => {
-    res.render('mijn-realtime/pending-approval');
+    res.render('mijn-realtime/pending-approval', { nonce: res.locals.cspNonce });
 });
 
 

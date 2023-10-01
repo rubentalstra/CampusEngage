@@ -8,7 +8,9 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const passportUser = require('./src/config/passportUsers');
 const router = require('./src/routes/mainRoutes');
-const { env } = require('process');
+const crypto = require('crypto');
+const { CronJob } = require('cron');
+const { updateRefundStatus } = require('./src/utilities/mollie');
 const MySQLStore = require('express-mysql-session')(session);
 
 
@@ -17,21 +19,26 @@ require('dotenv').config({ path: `./env/.env` });
 const app = express();
 
 
-// app.use(
-//     helmet({
-//         frameguard: {
-//             action: 'deny',
-//         },
-//         contentSecurityPolicy: {
-//             directives: {
-//                 ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-//                 'script-src': ["'self'"],
-//                 'connect-src': ["'self'"],
-//             },
-//         },
-//     })
-// );
 
+
+app.use((req, res, next) => {
+    res.locals.cspNonce = crypto.randomBytes(16).toString('hex');
+    next();
+});
+
+// Configure Helmet middleware for security headers
+app.use(
+    helmet({
+        frameguard: { action: 'deny' },
+        contentSecurityPolicy: {
+            directives: {
+                ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+                'script-src': ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`],
+                'connect-src': ["'self'"]
+            }
+        }
+    })
+);
 
 
 // Static files
@@ -42,7 +49,17 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 // Static files and other configurations
+app.use('/js', express.static(path.join(__dirname, 'node_modules/@fullcalendar')));
+app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery')));
+
+
+// app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
+// app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
+
+
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/sponsors', express.static(path.join(__dirname, 'uploads/sponsors')));
 
 
 // Body parser middleware to handle form data
@@ -107,3 +124,10 @@ if (process.env.NODE_ENV !== 'ngrok') {
         console.log(`App listening on port ${process.env.PORT_NGROK}!`);
     });
 }
+
+
+
+const job = new CronJob('0 */1 * * * *', async function () {
+    await updateRefundStatus();
+});
+job.start();

@@ -44,7 +44,7 @@ adminRouter.use((req, res, next) => {
             return;  // This is crucial, as you don't want any code after this block to run if a session is hijacked
         });
     } else {
-        console.log(req.session);
+        // console.log(req.session);
         console.log(req.user);
         req.session.userType = 'admin';
         next(); // Proceed to the next middleware or route handler
@@ -58,7 +58,7 @@ adminRouter.get('/session-hijacking', (req, res, next) => {
 // Adjusting the login success route:
 
 adminRouter.get('/login', (req, res, next) => {
-    res.render('admin/login');
+    res.render('admin/login', { nonce: res.locals.cspNonce });
 });
 
 adminRouter.post('/login', passportAdmins.authenticate('local-admin', {
@@ -87,7 +87,7 @@ adminRouter.get('/logout', (req, res, next) => {
 
 adminRouter.get('/register', (req, res, next) => {
     console.log('Inside get');
-    res.render('admin/register');
+    res.render('admin/register', { nonce: res.locals.cspNonce });
 
 });
 
@@ -129,7 +129,7 @@ adminRouter.get('/admin-dashboard', ensureAuthenticatedAdmin, adminEnsure2fa, ge
 adminRouter.get('/administration/members', ensureAuthenticatedAdmin, adminEnsure2fa, renderMemberPage);
 
 adminRouter.get('/managment/events', ensureAuthenticatedAdmin, adminEnsure2fa, (req, res) => {
-    res.render('admin/managment/events/index', { user: req.user });  // This should be a view where the user inputs their current 2FA code to remove it
+    res.render('admin/managment/events/index', { nonce: res.locals.cspNonce, user: req.user });  // This should be a view where the user inputs their current 2FA code to remove it
 });
 
 
@@ -191,8 +191,8 @@ adminRouter.get('/setup-2fa', ensureAuthenticatedAdmin, (req, res) => {
     // console.log(key);
 
     qrcode.toDataURL(key.url, (err, dataUrl) => {
-        if (err) { return res.render('admin/2fa/setup-2fa', { qrCode: dataUrl, secret: null, error: 'Some error message here' }); }
-        res.render('admin/2fa/setup-2fa', { qrCode: dataUrl, secret: key.secret });
+        if (err) { return res.render('admin/2fa/setup-2fa', { nonce: res.locals.cspNonce, qrCode: dataUrl, secret: null, error: 'Some error message here' }); }
+        res.render('admin/2fa/setup-2fa', { nonce: res.locals.cspNonce, qrCode: dataUrl, secret: key.secret });
     });
 });
 
@@ -218,7 +218,7 @@ adminRouter.post('/verify-2fa', ensureAuthenticatedAdmin, (req, res) => {
 // check 2FA
 adminRouter.get('/prompt-2fa', ensureAuthenticatedAdmin, (req, res, next) => {
     // if (req.session.is2faVerified) { return res.redirect('/admin/admin-dashboard'); }
-    return res.render('admin/2fa/prompt-2fa');
+    return res.render('admin/2fa/prompt-2fa', { nonce: res.locals.cspNonce });
 });
 
 
@@ -237,9 +237,9 @@ adminRouter.post('/check-2fa', ensureAuthenticatedAdmin, (req, res) => {
                 return res.redirect('/admin/admin-dashboard');
             }
 
-            res.render('admin/2fa/prompt-2fa', { error: 'Invalid token. Please try again.' });
+            res.render('admin/2fa/prompt-2fa', { nonce: res.locals.cspNonce, error: 'Invalid token. Please try again.' });
         } catch (error) {
-            res.render('admin/2fa/prompt-2fa', { error: 'Invalid token. Please try again.' });
+            res.render('admin/2fa/prompt-2fa', { nonce: res.locals.cspNonce, error: 'Invalid token. Please try again.' });
         }
     });
 });
@@ -248,7 +248,7 @@ adminRouter.post('/check-2fa', ensureAuthenticatedAdmin, (req, res) => {
 // remove 2FA
 
 adminRouter.get('/remove-2fa', ensureAuthenticatedAdmin, (req, res) => {
-    res.render('admin/2fa/prompt-remove-2fa');  // This should be a view where the user inputs their current 2FA code to remove it
+    res.render('admin/2fa/prompt-remove-2fa', { nonce: res.locals.cspNonce, });  // This should be a view where the user inputs their current 2FA code to remove it
 });
 
 
@@ -269,7 +269,7 @@ adminRouter.post('/confirm-remove-2fa', ensureAuthenticatedAdmin, (req, res) => 
                 res.send('2FA removed successfully');
             });
         } else {
-            res.render('admin/2fa/prompt-remove-2fa', { error: 'Invalid token. Please try again.' });
+            res.render('admin/2fa/prompt-remove-2fa', { nonce: res.locals.cspNonce, error: 'Invalid token. Please try again.' });
         }
     });
 });

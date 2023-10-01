@@ -37,12 +37,12 @@ const strategy = new LocalStrategy(customFields, verifyCallback);
 passportAdmin.use('local-admin', strategy);
 
 passportAdmin.serializeUser((user, done) => {
-    console.log('inside serialize');
+    // console.log('inside serialize');
     done(null, user.id);
 });
 
 passportAdmin.deserializeUser(function (adminId, done) {
-    console.log('deserializeUser ' + adminId);
+    // console.log('deserializeUser ' + adminId);
     connection.query('SELECT id, username,  isAdmin, hasFA FROM admins where id = ?', [adminId], function (error, results) {
         if (error) { return console.log(error.sqlMessage); }
         if (results && results.length && results[0]) {

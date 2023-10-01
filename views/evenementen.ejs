@@ -54,7 +54,17 @@
               <div class="event-header">
                 <h3><a href="/evenementen/<%= element.EventID  %>" title="<%= element.Name  %>"><%= element.Name  %></a></h3>
                 <ul class="list-unstyled list-inline text-muted small meta-list">
-                  <li><span class="fa fa-calendar"></span> 28 sep. 2023 16:00 - 19:30</li>
+                  <!-- <li><span class="fa fa-calendar"></span> 28 sep. 2023 16:00 - 19:30</li> -->
+
+                  <% let start = new Date(element.StartDateTime); %>
+                  <% let end = new Date(element.EndDateTime); %>
+                  <% if(start.toDateString() === end.toDateString()) { %>
+                  <li><span class="fa fa-calendar"></span><%= start.toLocaleString('nl-NL', {day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}) %> - <%= end.toLocaleString('nl-NL', {hour: '2-digit', minute: '2-digit'}) %></li>
+                  <% } else { %>
+                  <li><span class="fa fa-calendar"></span><%= start.toLocaleString('nl-NL', {day: 'numeric'}) %> - <%= end.toLocaleString('nl-NL', {day: 'numeric', month: 'short', year: 'numeric'}) %></li>
+                  <% } %>
+
+
                   <li><span class="fa fa-tag"></span> Educatief</li>
                   <li><span class="fa fa-group"></span> 11 deelnemers</li>
                   <li class="text-success meta-tag is-success">Aanmelding open</li>
@@ -166,16 +176,16 @@
 
   <!-- generic javascript -->
 
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js" integrity="sha512-vO6PFSXNczuXHhdvGbOIXm67ZQlaRFjp4Wh+ARLfqPT1bVlmO1kyGrB1+7c2clk58XnsD/Cye9EJubT5B8BCgQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle2/20140216/jquery.cycle2.min.js" integrity="sha512-9pKhpjfZyETI7JvNCClrb4FN+nz9vPTvIRkIygeN5jRfMu4FQPTaePd3I2uLqOS6+hWjXJRwZHvUW+y9TUPJhw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="/js/dist/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/jquery.cycle2.min.js"></script>
 
   <!-- template javascript -->
   <script src="/js/superfish-e25125463e3a68f85b0683f3bc21433b.js"></script>
   <script src="/js/main-aac80d816f26db8660321cb022f841b1.js"></script>
 
 
-  <script>
+  <script nonce="<%= nonce %>">
     document.addEventListener("DOMContentLoaded", function() {
       let currentPath = window.location.pathname.split("/")[1]; // get the highest level of the path
       let nav = document.querySelector(".header-nav");

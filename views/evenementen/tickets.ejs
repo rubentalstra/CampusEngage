@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Tickets</title>
+</head>
+
+<body>
+  <h1>Your Tickets</h1>
+  <form action="/evenementen/<%= EventID %>/participation/cancel" method="POST">
+    <% attendees.forEach(function(attendee){ %>
+    <div>
+      <input type="checkbox" name="attendeeIds" value="<%= attendee.AttendeeID %>" <% if(attendee.Refunded) { %> disabled <% } %>>
+      <span><%= attendee.GuestName ? attendee.GuestName : 'You (' + attendee.Member+ ')' %></span>
+      - Ticket ID: <%= attendee.TicketID %>
+      <% if(attendee.Refunded) { %>
+      - <span style="color:red;">Refunded</span>
+      <% } %>
+    </div>
+    <% }); %>
+    <button type="submit">Request Refund</button>
+  </form>
+</body>
+
+</html>

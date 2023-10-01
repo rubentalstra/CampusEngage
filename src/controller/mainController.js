@@ -92,21 +92,22 @@ exports.getAttendanceForEvent = async (req, res) => {
     const result = await query(`
     SELECT
     CONCAT(Members.initials, ' (', Members.first_name, ') ', Members.primary_last_name_prefix, Members.primary_last_name_main) AS 'Member',
-    (SELECT COUNT(*) FROM OrderRows sub WHERE sub.OrderID = OrderRows.OrderID) as 'Tickets'
+    COUNT(Attendees.AttendeeID) as 'Tickets'
 FROM
-    OrderRows
+    Attendees
 INNER JOIN
-    Members ON OrderRows.MemberID = Members.id
+    Members ON Attendees.BuyerID = Members.id
 LEFT JOIN
-    Orders ON OrderRows.OrderID = Orders.OrderID
-INNER JOIN
+    Orders ON Attendees.OrderID = Orders.OrderID
+LEFT JOIN
     Transactions ON Transactions.OrderID = Orders.OrderID
 WHERE
     Orders.EventID = ?
-    AND OrderRows.MemberID IS NOT NULL
+    AND Attendees.BuyerID IS NOT NULL
     AND (Transactions.RefundStatus IS NULL OR Transactions.RefundStatus NOT IN ('Refunded', 'Processing', 'Queued', 'Pending', 'Failed', 'Canceled'))
+    AND Attendees.Refunded = 0
 GROUP BY
-    OrderRows.OrderID, OrderRows.MemberID;`,
+    Attendees.OrderID, Attendees.BuyerID;`,
       [EventID]
     );
     return result;  // return ID of the new record
@@ -122,24 +123,52 @@ exports.getIfUserHasBoughtTicket = async (req, res) => {
     SELECT
     DATE_FORMAT(Tickets.CancelableUntil, '%e %b. %Y %H:%i:%s') as CancelableUntil
 FROM
-    OrderRows
+    Attendees
 LEFT JOIN
-    Tickets ON OrderRows.TicketID = Tickets.TicketID
+    Tickets ON Attendees.TicketID = Tickets.TicketID
 INNER JOIN
-    Orders ON OrderRows.OrderID = Orders.OrderID
+    Orders ON Attendees.OrderID = Orders.OrderID
 INNER JOIN
     Transactions ON Transactions.OrderID = Orders.OrderID
 WHERE
     Tickets.EventID = ?
-    AND OrderRows.MemberID = ?
-    AND OrderRows.MemberID IS NOT NULL
+    AND Attendees.BuyerID = ?
+    AND Attendees.BuyerID IS NOT NULL
     AND Transactions.Status = 'Paid'
     AND (Transactions.RefundStatus IS NULL OR Transactions.RefundStatus NOT IN ('Refunded', 'Processing', 'Queued', 'Pending', 'Failed', 'Canceled'))
+    AND Attendees.Refunded = 0
 LIMIT 1;
+
 `,
       [req.params.EventID, req.user.id]
     );
     return result[0];  // return ID of the new record
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+
+exports.getMyTicketsForEvent = async (req, res) => {
+
+  const EventID = req.params.EventID;
+
+  try {
+    const result = await query(`
+    SELECT
+        Attendees.*, CONCAT(Members.initials, ' (', Members.first_name, ') ', Members.primary_last_name_prefix, Members.primary_last_name_main) AS 'Member'
+    FROM
+        Attendees
+        LEFT JOIN Tickets ON Attendees.TicketID = Tickets.TicketID
+        INNER JOIN Members ON Attendees.BuyerID = Members.id
+    WHERE
+        EventID = ?
+        AND BuyerID = ?
+        AND Refunded = 0`,
+      [EventID, req.user.id]
+    );
+    return result;  // return ID of the new record
   } catch (error) {
     console.error(error);
     return null;

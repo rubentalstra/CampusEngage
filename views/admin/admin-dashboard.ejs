@@ -30,7 +30,7 @@
     </tbody>
   </table>
 
-  <script>
+  <script nonce="<%= nonce %>">
     function sendEmail(userId) {
       fetch('/admin/send-password-setup', {
         method: 'POST',
