@@ -1,5 +1,6 @@
 const connection = require('../config/database');
 const query = require('../config/database-all');
+const stripAndShortenHTML = require('../utilities/stripAndShortenHTML');
 
 exports.getHomePage = (req, res) => {
   // if (req.isAuthenticated()) {
@@ -28,13 +29,37 @@ exports.getLidWordenCountriesInformation = (req, res) => {
 exports.getEvents = async (req, res) => {
   try {
     const events = await query(`
-    SELECT Events.*, EventCategories.EventCategoryName FROM Events 
-
+  SELECT
+    Events.*,
+    EventCategories.EventCategoryName,
+    COUNT(Attendees.AttendeeID) AS 'Attendees'
+  FROM
+    Events
     LEFT JOIN EventCategories ON Events.EventCategoryID = EventCategories.EventCategoryID
-    
-    WHERE EndDateTime > NOW() AND Published = "published" ORDER BY StartDateTime ASC`
-    );
-    return events;  // return ID of the new record
+    LEFT JOIN Tickets ON Events.EventID = Tickets.EventID
+    LEFT JOIN Attendees ON Tickets.TicketID = Attendees.TicketID AND Attendees.Refunded = 0
+  WHERE
+    EndDateTime > NOW()
+    AND Published = "published"
+  GROUP BY
+    EventID
+  ORDER BY
+    StartDateTime ASC
+    `);
+    // Process each event's Notes field
+    const processedEvents = events.map(event => {
+      // Apply the stripAndShortenHTML function to the Notes field
+      const processedNotes = stripAndShortenHTML(event.Notes || '');
+
+      // Return the event with the processed Notes
+      return {
+        ...event,
+        Notes: processedNotes
+      };
+    });
+
+    // Send the processed events as the response
+    return processedEvents;
   } catch (error) {
     console.error('Error fetching Events:', error);
     res.status(500).json({ error: 'Internal Server Error' });

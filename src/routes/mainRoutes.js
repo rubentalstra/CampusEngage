@@ -19,6 +19,7 @@ const { ensureAuthenticatedUser, userEnsure2fa } = require('../middleware/auth')
 const { webhookVerification, createRefundPayment, } = require('../utilities/mollie');
 const { createOrder } = require('../utilities/order');
 const { getCalendarJson } = require('../controller/user/api');
+const eventRouter = require('./event/eventRoutes');
 
 
 
@@ -39,7 +40,7 @@ router.use((req, res, next) => {
         });
     } else {
         // console.log(req.session);
-        console.log(req.user);
+        // console.log(req.user);
         req.session.userType = 'user';
         next(); // Proceed to the next middleware or route handler
     }
@@ -59,54 +60,8 @@ router.get('/sponsors/:imageName', (req, res) => {
 });
 
 
-
-router.get('/evenementen', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
-
-    const events = await getEvents(req, res);
-
-    res.render('evenementen', { nonce: res.locals.cspNonce, user: req.user ?? undefined, events: events });
-});
-
-
-router.get('/evenementen/calendar', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
-    res.render('evenementen/calendar', { nonce: res.locals.cspNonce, user: req.user ?? undefined });
-});
-
-
-router.get('/evenementen/calendar/json', ensureAuthenticatedUser, userEnsure2fa, getCalendarJson);
-
-
-
-router.get('/evenementen/:EventID', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
-
-    const [eventDetails, attendance, CancelableUntil] = await Promise.all([getEventDetails(req, res), getAttendanceForEvent(req, res), getIfUserHasBoughtTicket(req, res)]);
-
-
-    res.render('evenementen/details', { nonce: res.locals.cspNonce, user: req.user ?? undefined, eventDetails: eventDetails, attendance: attendance, cancelDate: CancelableUntil });
-});
-
-
-router.get('/evenementen/:EventID/sign-up', ensureAuthenticatedUser, userEnsure2fa, createOrder);
-
-router.get('/evenementen/:EventID/participation/cancel', async (req, res) => {
-    // Replace the following with actual data retrieval logic from your database
-
-
-    const attendees = await getMyTicketsForEvent(req, res);
-
-    // console.log(attendees);
-
-    res.render('evenementen/tickets', { nonce: res.locals.cspNonce, user: req.user ?? undefined, attendees: attendees, EventID: req.params.EventID });
-});
-
-router.post('/evenementen/:EventID/participation/cancel', ensureAuthenticatedUser, userEnsure2fa, createRefundPayment);
-
-
-// router.get('/createOrder', ensureAuthenticatedUser, userEnsure2fa, createOrder);
-// router.get('/create-payment', ensureAuthenticatedUser, userEnsure2fa, createPayment);
-// router.get('/refund', createRefundPayment);
-router.post('/webhook', webhookVerification);
-// router.post('/redirect', ensureAuthenticatedUser, userEnsure2fa, webhookVerification);
+router.post('/evenementen/webhook', webhookVerification);
+router.use('/evenementen', ensureAuthenticatedUser, userEnsure2fa, eventRouter);
 
 
 

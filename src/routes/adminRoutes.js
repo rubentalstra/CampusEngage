@@ -45,7 +45,7 @@ adminRouter.use((req, res, next) => {
         });
     } else {
         // console.log(req.session);
-        console.log(req.user);
+        // console.log(req.user);
         req.session.userType = 'admin';
         next(); // Proceed to the next middleware or route handler
     }
