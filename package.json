@@ -1,5 +1,5 @@
 {
-  "name": "sv-realtime",
+  "name": "campus-engage",
   "version": "1.0.0",
   "description": "an admin portal + website",
   "main": "app.js",
@@ -25,11 +25,11 @@
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "express-mysql-session": "^3.0.0",
-    "express-rate-limit": "^7.0.1",
+    "express-rate-limit": "^7.1.0",
     "express-session": "^1.17.3",
     "helmet": "^7.0.0",
     "jquery": "^3.7.1",
-    "multer": "^1.4.5-lts.1",
+    "multer": "1.4.5-lts.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.6.1",
     "nodemailer": "^6.9.5",
@@ -46,7 +46,7 @@
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@sentry/webpack-plugin": "^2.7.1",
-    "eslint": "^8.49.0",
+    "eslint": "^8.50.0",
     "eslint-plugin-security-node": "^1.1.1"
   }
 }
