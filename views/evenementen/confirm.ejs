@@ -976,7 +976,7 @@
     <div class="max-w-2xl mx-auto lg:max-w-7xl">
 
 
-      <div class="max-w-2xl mx-auto py-16 px-4 sm:px-6 lg:max-w-7xl lg:px-8" x-data="event_information">
+      <div class="max-w-2xl mx-auto py-16 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
           <div x-show="$store.payment_method != 'external_ideal'" style="display: none;">
 
@@ -1173,7 +1173,7 @@
             <div class="py-6 lg:py-8">
               <div class="text-lg font-medium text-gray-900">Kies je betaalwijze</div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm" x-data="{...radioGroup(), selected: 'external_ideal'}" x-init="$watch('selected', value => $store.payment_method = value)">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm">
 
                 <label class="relative col-span-1 p-4 border rounded-lg cursor-pointer transition hover:border-gray-300 hover:shadow-sm focus:outline-none focus:border-primary/15">
                   <input value="external_ideal" class="sr-only peer" type="radio" name="payment_method" x-model="selected">
@@ -1183,7 +1183,7 @@
 
                       Je betaalt je bestelling via iDeal
                       <div class="absolute top-0 right-0 mt-4 mr-4">
-                        <img class="object-contain h-6 sm:h-6" src="https://cdn.cngrsss.nl/static/_templates/_base/checkout/images/payment_methods/ideal-logo-b7c06b374b4af4a21ac7f2f94ecc8cbe.svg" alt="iDeal">
+                        <img class="object-contain h-6 sm:h-6" src="/img/icons/ideal-logo-b7c06b374b4af4a21ac7f2f94ecc8cbe.svg" alt="iDeal">
                       </div>
 
                     </div>
