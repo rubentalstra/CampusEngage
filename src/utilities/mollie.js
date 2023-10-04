@@ -56,6 +56,7 @@ async function updateMollieID(mollieId, orderId, res) {
     }
 }
 
+
 function createMolliePayment(order, amount, req, res) {
     if (!order || !amount || !order.Currency || !order.Description || !order.OrderID) {
         return res.status(400).send('Invalid order or amount');

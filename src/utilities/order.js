@@ -6,6 +6,7 @@ const { createMolliePayment } = require('./mollie');
 async function createOrder(req, res) {
     try {
         const EventID = req.params.EventID;
+        const MemberID = req.user.id;
 
         if (!EventID) {
             return res.status(400).send('EventID is required');
@@ -18,16 +19,32 @@ async function createOrder(req, res) {
             return res.status(404).send('Event not found');
         }
 
+        /**
+        * Represents an order for tickets.
+        * @typedef {Object} order
+        * 
+        * @property {number} OrderID - The unique identifier for the order.
+        * @property {number} MemberID - The unique identifier for the member placing the order.
+        * @property {number} EventID - The unique identifier for the event for which the tickets are being ordered.
+        * @property {string} Description - A description of the order.
+        * @property {string} Currency - The currency in which the order is placed. Should be 'EUR'.
+        * @property {Array.<Attendee>} Attendees - An array of objects representing the attendees.
+        * 
+        * @typedef {Object} Attendee
+        * @property {number} TicketID - The unique identifier for the ticket.
+        * @property {number} MemberID - The unique identifier for the buyer of the ticket.
+        * @property {?string} GuestName - The name of the guest attending (if applicable, otherwise null).
+        */
         const order = {
             OrderID: orderId,
-            MemberID: req.user.id,
+            MemberID: MemberID,
             EventID: EventID,
             Description: description,
             Currency: 'EUR',
             Attendees: [
-                { TicketID: 1, BuyerID: req.user.id, GuestName: null },
-                { TicketID: 2, BuyerID: req.user.id, GuestName: 'Test' },
-                { TicketID: 2, BuyerID: req.user.id, GuestName: 'Test' },
+                { TicketID: 1, MemberID: MemberID, GuestName: null },
+                { TicketID: 2, MemberID: MemberID, GuestName: 'Test' },
+                { TicketID: 2, MemberID: MemberID, GuestName: 'Test' },
             ]
         };
 
@@ -62,12 +79,11 @@ async function createOrderRecord(order) {
 }
 
 
-
 async function createAttendees(order, res) {
     try {
         for (const attendee of order.Attendees) {
-            const insertSql = 'INSERT INTO Attendees (OrderID, TicketID, BuyerID, GuestName) VALUES (?, ?, ?, ?)';
-            await query(insertSql, [order.OrderID, attendee.TicketID, attendee.BuyerID, attendee.GuestName]);
+            const insertSql = 'INSERT INTO Attendees (OrderID, TicketID, MemberID, GuestName) VALUES (?, ?, ?, ?)';
+            await query(insertSql, [order.OrderID, attendee.TicketID, attendee.MemberID, attendee.GuestName]);
         }
     } catch (error) {
         res.status(500).send('Internal Server Error');

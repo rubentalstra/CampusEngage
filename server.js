@@ -45,6 +45,7 @@ app.use(
 app.use(express.static('public'));
 
 // Set view engine
+app.disable('x-powered-by');
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
@@ -53,7 +54,7 @@ app.use('/js', express.static(path.join(__dirname, 'node_modules/@fullcalendar')
 app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery')));
 
 
-// app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
+app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
 // app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
 
 

@@ -7,7 +7,7 @@ const query = require('../../config/database-all');
 // 
 
 
-async function getUserIdToAttendeeIdMapping(EventID, BuyerID) {
+async function getUserIdToAttendeeIdMapping(EventID, MemberID) {
     try {
         const sql = `
         SELECT
@@ -17,11 +17,11 @@ async function getUserIdToAttendeeIdMapping(EventID, BuyerID) {
         LEFT JOIN Tickets ON Attendees.TicketID = Tickets.TicketID
     WHERE
         EventID = ?
-        AND BuyerID = ?
+        AND MemberID = ?
         AND GuestName IS NULL
         AND Refunded = 0
         `;
-        const result = await query(sql, [EventID, BuyerID]);
+        const result = await query(sql, [EventID, MemberID]);
         return result[0].AttendeeID;
     } catch (error) {
         console.error(error);
@@ -30,7 +30,7 @@ async function getUserIdToAttendeeIdMapping(EventID, BuyerID) {
 }
 
 
-async function getEligibleAttendeesForRefund(EventID, BuyerID) {
+async function getEligibleAttendeesForRefund(EventID, MemberID) {
     try {
         // Query your database to get attendees that are eligible for refund.
         // Replace the SQL query with your actual query.
@@ -42,10 +42,10 @@ async function getEligibleAttendeesForRefund(EventID, BuyerID) {
         LEFT JOIN Tickets ON Attendees.TicketID = Tickets.TicketID
     WHERE
         EventID = ?
-        AND BuyerID = ?
+        AND MemberID = ?
         AND Refunded = 0
         `;
-        const result = await query(sql, [EventID, BuyerID]);
+        const result = await query(sql, [EventID, MemberID]);
         return result;
     } catch (error) {
         console.error(error);

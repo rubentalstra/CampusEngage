@@ -9,7 +9,7 @@ exports.getCalendarJson = async (req, res) => {
 
         LEFT JOIN EventCategories ON Events.EventCategoryID = EventCategories.EventCategoryID
         
-        WHERE EndDateTime > NOW() AND Published = "published" ORDER BY StartDateTime ASC`;
+        WHERE Published = "published" ORDER BY StartDateTime ASC`;
         const results = await query(sql);
 
         // Format the data as needed

@@ -65,15 +65,29 @@
             </dl>
           </div> -->
           <div class="aside-block">
+            <% 
+            const isEventActive = new Date(eventDetails.EndDateTime) > new Date();
+          
+            function renderButton(text, href, additionalClass = '') {
+              return `<a class="btn ${additionalClass} btn-block" href="${href}">${text}</a>`;
+            }
+          
+            function renderCancelableInfo(cancelDate) {
+              return `<div class="text-muted small margin-bottom-20">Je kunt je bestelling annuleren tot ${cancelDate.CancelableUntil}</div>`;
+            }
+          %>
 
+            <% if (isEventActive) { %>
             <% if (!cancelDate) { %>
-            <a class="btn btn-primary btn-block" href="/evenementen/<%= eventDetails.EventID %>/tickets">Tickets kopen</a>
-            <% } else  { %>
-            <a class="btn btn-default btn-block margin-bottom-10" href="/evenementen/<%= eventDetails.EventID %>/participation/cancel">Afmelden</a>
-            <div class="text-muted small margin-bottom-20">
-              Je kunt je bestelling annuleren tot <%= cancelDate.CancelableUntil %>
-            </div>
+            <%- renderButton('Tickets kopen', `/evenementen/${eventDetails.EventID}/tickets`, 'btn-primary') %>
+            <% } else { %>
+            <%- renderButton('Afmelden', `/evenementen/${eventDetails.EventID}/participation/cancel`, 'btn-default margin-bottom-10') %>
+            <div class="text-muted small margin-bottom-20">Je kunt je bestelling annuleren tot <%= cancelDate.CancelableUntil %> </div>
             <% } %>
+            <% } else { %>
+            <button class="btn btn-secondary btn-block">Event Gesloten</button>
+            <% } %>
+
 
             <!-- <div class="headline">
               <h4>Je tickets</h4>
