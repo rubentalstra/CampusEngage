@@ -995,7 +995,7 @@
         </h2>
 
         <form class="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start xl:gap-x-16" method="post">
-          <!-- <input id="csrf_token" name="csrf_token" type="hidden" value="IjQ1Mjg5YmFkMDg0OTdhZTU2YmQzYjc5OTMyMDczYjNkYWFkMzlmZTAi.ZRqDAA.JojRP5IpZBq-KjaGG1OJbxPi6Xs"> -->
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
           <section aria-labelledby="cart-options" class="lg:col-span-7">
             <h2 id="cart-options" class="sr-only">Check and confirm your order</h2>
@@ -1023,15 +1023,7 @@
 
 
                   <div class="prose prose-sm mt-4 text-gray-700 line-clamp-3 max-h-24" id="textContent">
-                    <p>Het is natuurlijk weer tijd voor het volgende gezelligheidsactiviteit! Op woensdag 11 Oktober vanaf 20:00 uur gaan we heerlijk relaxt bowlen!</p>
-                    <p>Wil jij dit ook niet missen? Meld je dan snel aan!</p>
-                    <p>TL;DR<br>
-                      Bowlen<br>
-                      Woensdag 11 oktober<br>
-                      20:00 - 22:00 uur<br>
-                      Bowlingcentrum Groningen<br>
-                      €5,- voor leden, €23,50 voor niet-leden<br>
-                      2 uur bowlen inclusief borrelhapjes</p>
+                    <%- event.Notes %>
                   </div>
                   <div class="mt-2">
                     <a href="#" id="toggleButton" class="text-sm text-primary/85 transition hover:underline hover:text-primary">toon meer</a>
@@ -1062,68 +1054,7 @@
 
 
 
-
-                <ul class="grid grid-cols-1 gap-2 mt-4 text-sm">
-                  <li class="col-span-1 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                    <div class="font-semibold text-gray-700">
-                      <div class="container">
-                        <div class="row">
-                          <div class="col-md-6">
-                            <div class="form-group">
-                              <select name="memberTicket" id="memberTicket" class="form-control custom-select">
-                                <% if (hasTicket) { %>
-                                <option value="0" selected>0x</option>
-                                <% } else {%>
-                                <option value="1" selected>1x</option>
-                                <% } %>
-                              </select>
-                            </div>
-                          </div>
-                          <div class="col-md-6 d-flex align-items-center ">
-                            <div class="form-group">
-                              <span>Bowlen - Lid</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-                  </li>
-
-                  <!-- Add more list items like the one above to create additional rows/columns -->
-
-                </ul>
-
-
-
-
-
-                <ul class="grid grid-cols-1 gap-2 mt-4 text-sm">
-                  <li class="col-span-1 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                    <div class="font-semibold text-gray-700">
-                      <div class="container">
-                        <div class="row">
-                          <div class="col-md-6">
-                            <div class="form-group">
-                              <select name="guestTickets" id="guestTickets" class="form-control custom-select">
-                                <% for (let i = 0; i <= 10; i++) { %>
-                                <option value="<%= i %>"><%= i %>x</option>
-                                <% } %>
-                              </select>
-                            </div>
-                          </div>
-                          <div class="col-md-6 d-flex align-items-center ">
-                            <div class="form-group">
-                              <span>Bowlen - niet Lid</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-                  </li>
-                </ul>
-
+                <ul id="ticketSelectors" class="grid grid-cols-1 gap-2 mt-4 text-sm"></ul>
                 <div id="guestNames"></div>
 
 
@@ -1203,45 +1134,22 @@
             <div id="summary-list" class="mt-6 space-y-4">
 
 
-              <!-- Maybe later -->
-              <% //for (let i = 0; i < tickets.length; i++) { %>
-              <!-- <div class="flex items-center justify-between<%= //i === tickets.length - 1 ? ' pb-4 border-b border-gray-200' : '' %>">
-                  <dt class="text-sm text-gray-600">
-                    <span id="<%= //tickets[i].TicketID %>-Count">0x</span>
-                    <span><%= //tickets[i].TicketName %></span>
-                  </dt>
-                  <dd class="text-sm font-medium text-gray-900" id="<%= //tickets[i].TicketID %>-Price">€ <%= //tickets[i].Price %></dd>
-                </div> -->
-              <% //} %>
-
-
-
-
-              <div class="flex items-center justify-between ">
+              <% tickets.forEach((element, index) => { %>
+              <div class="flex items-center justify-between <%= (index === tickets.length - 1) ? 'pb-4 border-b border-gray-200' : '' %>">
                 <dt class="text-sm text-gray-600">
-                  <span id="memberTicketCount">0x</span>
-                  <span>Bowlen - Lid</span>
+                  <span id="ticket<%= element.TicketID %>Count">0x</span>
+                  <span><%= element.TicketName %></span>
                 </dt>
-                <dd class="text-sm font-medium text-gray-900" id="memberTicketPrice">€ 5,00</dd>
+                <dd class="text-sm font-medium text-gray-900" id="ticket<%= element.TicketID %>Price">€ <%= element.Price.replace('.', ',') %></dd>
               </div>
-
-              <!-- Non-Member Ticket Section -->
-              <div class="flex items-center justify-between pb-4 border-b border-gray-200">
-                <dt class="text-sm text-gray-600">
-                  <span id="guestTicketCount">0x</span>
-                  <span>Bowlen - Niet Lid</span>
-                </dt>
-                <dd class="text-sm font-medium text-gray-900" id="guestTicketPrice">€ 20,00</dd>
-              </div>
-
-
-
+              <% }) %>
 
 
               <div class="flex items-center justify-between">
                 <dt class="text-base font-medium text-gray-900">Totaal</dt>
                 <dd class="text-base font-medium text-gray-900" id="totalPrice">€ 0,00</dd>
               </div>
+
             </div>
 
             <div class="mt-6 fixed inset-x-0 lg:static bottom-0 p-4 border-t border-gray-200 lg:p-0 lg:border-t-0 z-20 bg-gray-50">
@@ -1314,25 +1222,27 @@
 
 
   <script nonce="<%= nonce %>">
-    const textContent = document.getElementById('textContent');
-    const toggleButton = document.getElementById('toggleButton');
+    document.addEventListener('DOMContentLoaded', function() {
 
-    toggleButton.addEventListener('click', function(event) {
-      event.preventDefault();
+      const textContent = document.getElementById('textContent');
+      const toggleButton = document.getElementById('toggleButton');
 
-      if (textContent.classList.contains('line-clamp-3')) {
-        textContent.classList.remove('line-clamp-3', 'max-h-24');
-        textContent.classList.add('line-clamp-none', 'max-h-fit');
-        toggleButton.textContent = 'toon minder';
-      } else {
-        textContent.classList.add('line-clamp-3', 'max-h-24');
-        textContent.classList.remove('line-clamp-none', 'max-h-fit');
-        toggleButton.textContent = 'toon meer';
-      }
-    });
+      toggleButton.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        if (textContent.classList.contains('line-clamp-3')) {
+          textContent.classList.remove('line-clamp-3', 'max-h-24');
+          textContent.classList.add('line-clamp-none', 'max-h-fit');
+          toggleButton.textContent = 'toon minder';
+        } else {
+          textContent.classList.add('line-clamp-3', 'max-h-24');
+          textContent.classList.remove('line-clamp-none', 'max-h-fit');
+          toggleButton.textContent = 'toon meer';
+        }
+      });
 
 
-    document.addEventListener('DOMContentLoaded', (event) => {
+      // document.addEventListener('DOMContentLoaded', (event) => {
       const readOnlyView = document.getElementById('readOnlyView');
       const editForm = document.getElementById('editForm');
       const editLink = document.getElementById('editLink');
@@ -1361,72 +1271,135 @@
         document.getElementById('address-city').value = 'Drachten';
         // ...set values for other fields as needed...
       }
-    });
+      // });
 
 
 
-    $(document).ready(function() {
+      // TICKETS STUFF
+      const ticketsData = JSON.parse('<%- JSON.stringify(tickets) %>'); // Assuming ticketsFromServer is your server-side variable containing ticket data
+      // console.log(ticketsData)
+      const ticketSelectorsUl = document.getElementById('ticketSelectors');
 
-      const memberTicketSelect = document.getElementById('memberTicket');
-      const guestTicketSelect = document.getElementById('guestTickets');
-      const memberTicketCount = document.getElementById('memberTicketCount');
-      const guestTicketCount = document.getElementById('guestTicketCount');
-      const memberTicketPrice = document.getElementById('memberTicketPrice');
-      const guestTicketPrice = document.getElementById('guestTicketPrice');
-      const totalPrice = document.getElementById('totalPrice');
-      const guestNamesDiv = document.getElementById('guestNames');
+      ticketsData.forEach(ticket => {
+        const li = document.createElement('li');
+        li.className = 'col-span-1 p-4 border border-gray-200 rounded-lg bg-gray-50';
 
-      // Function to update the summary and guest names based on selected options
-      function updateSummaryAndGuestNames() {
-        const selectedMemberTickets = parseInt(memberTicketSelect.value, 10);
-        const selectedGuestTickets = parseInt(guestTicketSelect.value, 10);
+        const divFont = document.createElement('div');
+        divFont.className = 'font-semibold text-gray-700';
 
-        // Update counts
-        memberTicketCount.textContent = `${selectedMemberTickets}x`;
-        guestTicketCount.textContent = `${selectedGuestTickets}x`;
+        const divContainer = document.createElement('div');
+        divContainer.className = 'container';
 
-        // console.log(memberTicketPrice.textContent)
-        // console.log(guestTicketPrice.textContent)
+        const divRow = document.createElement('div');
+        divRow.className = 'row';
 
-        // Calculate prices
-        const memberTicketCost = selectedMemberTickets * parseFloat(memberTicketPrice.textContent.replace("€", "").trim()); // Adjust the price as needed
-        const guestTicketCost = selectedGuestTickets * parseFloat(guestTicketPrice.textContent.replace("€", "").trim()); // Adjust the price as needed
-        // memberTicketPrice.textContent = `€ ${memberTicketCost.toFixed(2)}`;
-        // guestTicketPrice.textContent = `€ ${guestTicketCost.toFixed(2)}`;
+        const divColSelect = document.createElement('div');
+        divColSelect.className = 'col-md-6';
 
-        // Calculate and update total
-        const totalCost = memberTicketCost + guestTicketCost;
-        totalPrice.textContent = `€ ${totalCost.toFixed(2)}`;
+        const divFormGroupSelect = document.createElement('div');
+        divFormGroupSelect.className = 'form-group';
 
-        // Clear previous guest name fields
+        const select = document.createElement('select');
+        select.name = `ticket${ticket.TicketID}`;
+        select.id = `ticket${ticket.TicketID}`;
+        select.className = 'form-control custom-select ticket-select';
+        select.dataset.ticketId = `${ticket.TicketID}`;
+        select.dataset.ticketPrice = `${ticket.Price}`;
+        for (let i = 0; i <= (ticket.MemberOnly ? 1 : 10); i++) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = `${i}x`;
+          select.appendChild(option);
+        }
+        select.addEventListener('change', function() {
+          updateGuestNames(ticket.TicketID, ticket.MemberOnly, parseInt(this.value, 10));
+        });
+
+        divFormGroupSelect.appendChild(select);
+        divColSelect.appendChild(divFormGroupSelect);
+        divRow.appendChild(divColSelect);
+
+        const divColLabel = document.createElement('div');
+        divColLabel.className = 'col-md-6 d-flex align-items-center';
+
+        const divFormGroupLabel = document.createElement('div');
+        divFormGroupLabel.className = 'form-group';
+
+        const span = document.createElement('span');
+        span.textContent = ticket.TicketName;
+
+        divFormGroupLabel.appendChild(span);
+        divColLabel.appendChild(divFormGroupLabel);
+        divRow.appendChild(divColLabel);
+
+        divContainer.appendChild(divRow);
+        divFont.appendChild(divContainer);
+        li.appendChild(divFont);
+        ticketSelectorsUl.appendChild(li);
+
+        const guestNamesDiv = document.createElement('div');
+        guestNamesDiv.id = `guestNames${ticket.TicketID}`;
+        li.appendChild(guestNamesDiv);
+      });
+
+      function updateGuestNames(ticketID, memberOnly, count) {
+        const guestNamesDiv = document.getElementById(`guestNames${ticketID}`);
         guestNamesDiv.innerHTML = '';
-
-        // Generate and append guest name fields
-        for (let i = 1; i <= selectedGuestTickets; i++) {
-          const div = document.createElement('div');
-          div.classList.add('mb-3');
-          const label = document.createElement('label');
-          label.textContent = `Guest ${i} Name:`;
-          label.setAttribute('for', `guestName${i}`);
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.classList.add('form-control');
-          input.id = `guestName${i}`;
-          input.name = `guestName${i}`;
-          input.required = true;
-
-          div.appendChild(label);
-          div.appendChild(input);
-          guestNamesDiv.appendChild(div);
+        if (memberOnly === 0 && count > 0) {
+          for (let i = 1; i <= count; i++) {
+            const label = document.createElement('label');
+            label.textContent = `Guest ${i} Name for ticket ${ticketID}: `;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.required = true;
+            guestNamesDiv.appendChild(label);
+            guestNamesDiv.appendChild(input);
+            guestNamesDiv.appendChild(document.createElement('br'));
+          }
         }
       }
 
-      // Update summary and guest names initially
-      updateSummaryAndGuestNames();
 
-      // Event listeners to update summary and guest names when selects change
-      memberTicketSelect.addEventListener('change', updateSummaryAndGuestNames);
-      guestTicketSelect.addEventListener('change', updateSummaryAndGuestNames);
+      // This function updates the sidebar for each ticket type
+      function updateSidebar(ticketID, count, ticketPrice) {
+        const ticketCountElement = document.getElementById(`ticket${ticketID}Count`);
+        const ticketPriceElement = document.getElementById(`ticket${ticketID}Price`);
+
+        ticketCountElement.textContent = `${count}x`;
+
+        // const ticketPrice = memberOnly ? 5 : 20; // Set the price for member and non-member tickets
+        const totalPriceForTicket = count * ticketPrice;
+        // ticketPriceElement.textContent = `€ ${totalPriceForTicket.toFixed(2).replace('.', ',')}`;
+
+        updateTotal();
+      }
+
+      // This function calculates and updates the total price in the sidebar
+      function updateTotal() {
+        let total = 0;
+        ticketsData.forEach(ticket => {
+          const countElement = document.getElementById(`ticket${ticket.TicketID}Count`);
+          const count = parseInt(countElement.textContent, 10);
+          const price = parseFloat(ticket.Price); // assuming ticket.Price is a string representation of a float
+          total += count * price;
+        });
+        document.getElementById('totalPrice').textContent = `€ ${total.toFixed(2).replace('.', ',')}`;
+      }
+
+
+
+      const ticketSelects = document.querySelectorAll('.ticket-select');
+      // Iterate over each select element and add an event listener
+      ticketSelects.forEach(function(select) {
+        select.addEventListener('change', function() {
+          const ticketID = this.dataset.ticketId;
+          const ticketPrice = this.dataset.ticketPrice;
+
+          // console.log(ticketID)
+          // console.log(ticketPrice)
+          updateSidebar(ticketID, parseInt(this.value, 10), ticketPrice);
+        });
+      });
     });
   </script>
 

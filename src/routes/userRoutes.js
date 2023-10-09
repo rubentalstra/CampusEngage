@@ -260,8 +260,6 @@ function userRouter(settings) {
         req.session.temp2fa = key.secret;  // Store it temporarily until confirmed
 
         console.log(key);
-
-        // Totp.generateKey({ issuer: "N0C", user: "johndoe@n0c.com" });
         // Generate a QR Code for the user to scan
 
         qrcode.toDataURL(key.url, (err, dataUrl) => {

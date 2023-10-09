@@ -65,7 +65,7 @@ function initRouter(settings) {
 
 
     router.get('/styles.css', (req, res) => {
-        const cssPath = path.join(__dirname, '../../zmefuq_main.css');
+        const cssPath = path.join(__dirname, '../../public/css/zmefuq_main.css');
         let css = fs.readFileSync(cssPath, 'utf8');
         // Replace the old color with the new one from settings
         // Replace colors with those from settings
