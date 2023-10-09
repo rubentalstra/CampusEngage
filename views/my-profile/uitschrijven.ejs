@@ -18,14 +18,14 @@
 
 <body class="template-content webpage-5437 module-profile authenticated-user">
 
-  <%- include('../includes/header', {user: user}); %>
+  <%- include('../includes/header', {settings, user: user}); %>
 
 
   <section id="content">
     <div class="content-header content-header-background">
       <div class="container">
         <ol class="breadcrumb">
-          <li><a href="/mijn-realtime">Mijn RealTime</a></li>
+          <li><a href="/<%= settings.profileRoute %>">Mijn RealTime</a></li>
           <li class="active">Uitschrijven</li>
         </ol>
         <h2>Uitschrijven</h2>
@@ -35,12 +35,12 @@
       <div class="row">
         <div class="aside col-md-3">
           <ul id="submenu">
-            <li><a href="/mijn-realtime/profiel" title="">Profiel</a></li>
-            <li><a href="/mijn-realtime/groepen" title="">Groepen</a></li>
-            <li><a href="/mijn-realtime/smoelenboek" title="">Smoelenboek</a></li>
-            <li><a href="/mijn-realtime/merchandise" title="">Merchandise</a></li>
-            <li><a href="/mijn-realtime/agenda" title="">Agenda</a></li>
-            <li class="active"><a href="/mijn-realtime/uitschrijven" title="">Uitschrijven</a></li>
+            <li><a href="/<%= settings.profileRoute %>/profiel" title="">Profiel</a></li>
+            <li><a href="/<%= settings.profileRoute %>/groepen" title="">Groepen</a></li>
+            <li><a href="/<%= settings.profileRoute %>/smoelenboek" title="">Smoelenboek</a></li>
+            <li><a href="/<%= settings.profileRoute %>/merchandise" title="">Merchandise</a></li>
+            <li><a href="/<%= settings.profileRoute %>/agenda" title="">Agenda</a></li>
+            <li class="active"><a href="/<%= settings.profileRoute %>/uitschrijven" title="">Uitschrijven</a></li>
           </ul>
         </div>
         <div class="paragraphs col-md-9">

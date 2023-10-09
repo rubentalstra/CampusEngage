@@ -15,7 +15,8 @@
   <% } %>
   <p>Or manually enter this secret code in your 2FA app: <strong><%= secret %></strong></p>
 
-  <form action="/mijn-realtime/verify-2fa" method="post">
+  <form action="/<%= settings.profileRoute %>/verify-2fa" method="post">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <label for="token">Enter the token from your 2FA application:</label>
     <input type="text" id="token" name="token" required>
     <button type="submit">Verify & Set up 2FA</button>

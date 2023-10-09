@@ -7,60 +7,60 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passportUser = require('./src/config/passportUsers');
-const router = require('./src/routes/mainRoutes');
 const crypto = require('crypto');
+const cookieParser = require('cookie-parser');
+const { doubleCsrf } = require('csrf-csrf');
+
 const { CronJob } = require('cron');
 const { updateRefundStatus } = require('./src/utilities/mollie');
+const initRouter = require('./src/routes/mainRoutes');
 const MySQLStore = require('express-mysql-session')(session);
 
-
 require('dotenv').config({ path: `./env/.env` });
+
+
 
 const app = express();
 
 
+// Load settings from file
+const settingsPath = path.join(__dirname, 'settings.json');
+let settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
 
 
+// Set view engine and disable x-powered-by header
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+app.disable('x-powered-by');
+
+
+// Static files
+app.use(express.static('public'));
+app.use('/js', express.static(path.join(__dirname, 'node_modules/@fullcalendar')));
+app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery')));
+app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
+// app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/sponsors', express.static(path.join(__dirname, 'uploads/sponsors')));
+
+
+
+// Security configurations
 app.use((req, res, next) => {
     res.locals.cspNonce = crypto.randomBytes(16).toString('hex');
     next();
 });
 
-// Configure Helmet middleware for security headers
-app.use(
-    helmet({
-        frameguard: { action: 'deny' },
-        contentSecurityPolicy: {
-            directives: {
-                ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-                'script-src': ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`],
-                'connect-src': ["'self'"]
-            }
+app.use(helmet({
+    frameguard: { action: 'deny' },
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            'script-src': ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`],
+            'connect-src': ["'self'"]
         }
-    })
-);
-
-
-// Static files
-app.use(express.static('public'));
-
-// Set view engine
-app.disable('x-powered-by');
-app.set('view engine', 'ejs');
-app.set('views', 'views');
-
-// Static files and other configurations
-app.use('/js', express.static(path.join(__dirname, 'node_modules/@fullcalendar')));
-app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery')));
-
-
-app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
-// app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
-
-
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// app.use('/sponsors', express.static(path.join(__dirname, 'uploads/sponsors')));
+    }
+}));
 
 
 // Body parser middleware to handle form data
@@ -68,8 +68,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-// Initialize Passport and session
-// Separate session and passport middleware for Users
+// Session and authentication
 app.use(session({
     name: 'userSession',
     key: process.env.USER_SESSION_KEY,
@@ -92,22 +91,57 @@ app.use(passportUser.initialize());
 app.use(passportUser.session());
 
 
-
-
-
+// Rate limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 1000, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
-
-// Apply the rate limiting middleware to all requests
 app.use(limiter);
 
-// Use the mainRoutes for handling routes
+// Set up cookie parser and use it before csurf
+app.use(cookieParser(process.env.CSRF));
+
+const { generateToken, doubleCsrfProtection } = doubleCsrf({
+    getSecret: () => process.env.CSRF,
+    cookieName: process.env.CSRF_COOKIE_NAME,
+    cookieOptions: {
+        sameSite: 'Strict',
+        path: '/',
+        secure: true, // Set to false if you are running on http during development
+    },
+    getTokenFromRequest: (req) => req.body._csrf, // Extract the token from the body
+
+});
+
+
+// Make CSRF token available to templates
+app.use((req, res, next) => {
+    res.locals.csrfToken = generateToken(req, res);
+    next();
+});
+
+app.use(doubleCsrfProtection);
+
+
+// Initialize router
+const router = initRouter(settings);
 app.use('/', router);
-// app.use('/admin', adminRouter);
+
+
+// Error-handling middleware
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') { // CSRF token validation failed
+        // Render your error page with a CSRF error
+        res.status(403);
+        return res.render('errors/csrf-error', { error: 'CSRF token invalid' });
+    }
+
+    // // Handle other errors differently
+    // res.status(500);
+    // res.render('errors/error', { error: 'Internal Server Error' });
+});
 
 // HTTPS server setup
 const options = {
@@ -115,17 +149,13 @@ const options = {
     cert: fs.readFileSync(`./cert/server.crt`),
 };
 
-if (process.env.NODE_ENV !== 'ngrok') {
-    const server = https.createServer(options, app);
-    server.listen(process.env.PORT, () => {
-        console.log(`App listening on port ${process.env.PORT}!`);
-    });
-} else {
-    app.listen(process.env.PORT_NGROK, () => {
-        console.log(`App listening on port ${process.env.PORT_NGROK}!`);
-    });
-}
+const server = process.env.NODE_ENV !== 'ngrok' ?
+    https.createServer(options, app) :
+    app;
 
+server.listen(process.env.NODE_ENV !== 'ngrok' ? process.env.PORT : process.env.PORT_NGROK, () => {
+    console.log(`App listening on port ${process.env.PORT}!`);
+});
 
 
 const job = new CronJob('0 */1 * * * *', async function () {

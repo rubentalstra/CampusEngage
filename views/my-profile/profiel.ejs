@@ -18,14 +18,14 @@
 
 <body class="template-content webpage-5437 module-profile authenticated-user">
 
-  <%- include('../includes/header', {user: user}); %>
+  <%- include('../includes/header', {settings, user: user}); %>
 
   <section id="content">
     <div class="content-header content-header-background">
       <div class="container">
         <ol class="breadcrumb">
           <li>
-            <a href="/mijn-realtime">Mijn RealTime</a>
+            <a href="/<%= settings.profileRoute %>">Mijn RealTime</a>
           </li>
           <li class="active">Profiel</li>
         </ol>
@@ -37,33 +37,33 @@
         <div class="aside col-md-3">
           <ul id="submenu">
             <li class="active">
-              <a href="/mijn-realtime/profiel" title="">Profiel</a>
+              <a href="/<%= settings.profileRoute %>/profiel" title="">Profiel</a>
               <ul>
                 <li>
-                  <a href="/mijn-realtime/profiel/2fa" title="">2FA Settings</a>
+                  <a href="/<%= settings.profileRoute %>/profiel/2fa" title="">2FA Settings</a>
                 <li>
                 <li>
-                  <a href="/mijn-realtime/profiel/groepen" title="">Mijn groepen</a>
+                  <a href="/<%= settings.profileRoute %>/profiel/groepen" title="">Mijn groepen</a>
                 <li>
-                  <a href="/mijn-realtime/profiel/evenementen" title="">Mijn evenementen</a>
+                  <a href="/<%= settings.profileRoute %>/profiel/evenementen" title="">Mijn evenementen</a>
                 <li>
-                  <a href="/mijn-realtime/profiel/facturen" title="">Mijn facturen</a>
+                  <a href="/<%= settings.profileRoute %>/profiel/facturen" title="">Mijn facturen</a>
               </ul>
             </li>
             <li>
-              <a href="/mijn-realtime/groepen" title="">Groepen</a>
+              <a href="/<%= settings.profileRoute %>/groepen" title="">Groepen</a>
             </li>
             <li>
-              <a href="/mijn-realtime/smoelenboek" title="">Smoelenboek</a>
+              <a href="/<%= settings.profileRoute %>/smoelenboek" title="">Smoelenboek</a>
             </li>
             <li>
-              <a href="/mijn-realtime/merchandise" title="">Merchandise</a>
+              <a href="/<%= settings.profileRoute %>/merchandise" title="">Merchandise</a>
             </li>
             <li>
-              <a href="/mijn-realtime/agenda" title="">Agenda</a>
+              <a href="/<%= settings.profileRoute %>/agenda" title="">Agenda</a>
             </li>
             <li>
-              <a href="/mijn-realtime/uitschrijven" title="">Uitschrijven</a>
+              <a href="/<%= settings.profileRoute %>/uitschrijven" title="">Uitschrijven</a>
             </li>
           </ul>
         </div>
@@ -97,11 +97,11 @@
                   <div class="profile-picture pull-right">
 
                     <!-- Image or Placeholder -->
-                    <% if (imagePath) { %>
+                    <% if (userData.imagePath) { %>
                     <div>
-                      <img src="/mijn-realtime/view/<%= user.id %>" alt="Profile Picture" width="200">
+                      <img src="/<%= settings.profileRoute %>/view/<%= user.id %>" alt="Profile Picture" width="200">
 
-                      <form action="/mijn-realtime/delete/<%= user.id %>" method="post">
+                      <form action="/<%= settings.profileRoute %>/delete/<%= user.id %>" method="post">
                         <button type="submit">Delete</button>
                       </form>
                     </div>
@@ -125,7 +125,7 @@
                         <span>Geslacht</span>
                       </label>
                       <div class="col-sm-7">
-                        <p class="form-control-static">Man</p>
+                        <p class="form-control-static"><%= userData.geslacht %></p>
                       </div>
                     </div>
 
@@ -134,7 +134,7 @@
                         <span>Geboortedatum</span>
                       </label>
                       <div class="col-sm-7">
-                        <p class="form-control-static">12 nov. 2001</p>
+                        <p class="form-control-static"><%= new Date(userData.geboortedatum).toLocaleDateString('nl-NL') %></p>
                       </div>
                     </div>
 
@@ -143,17 +143,17 @@
                         <span>Naam</span>
                       </label>
                       <div class="col-sm-7">
-                        <p class="form-control-static">R.D. (Ruben Daniël) Talstra</p>
+                        <p class="form-control-static"><%= userData.Name %></p>
                       </div>
                     </div>
 
-                    <% if (!imagePath) { %>
+                    <% if (!userData.imagePath) { %>
                     <div class="form-group">
                       <label class="col-sm-5 col-md-4 col-lg-3 control-label" for="">
                         <span>Upload Image</span>
                       </label>
                       <div class="col-sm-7">
-                        <form action="/mijn-realtime/upload" method="post" enctype="multipart/form-data">
+                        <form action="/<%= settings.profileRoute %>/upload" method="post" enctype="multipart/form-data">
                           <input type="file" name="profilePic" required>
 
                           <label>
@@ -180,7 +180,7 @@
                       </label>
                       <div class="col-sm-7">
                         <p class="form-control-static">
-                          <a href="mailto:r.d.talstra@st.hanze.nl">r.d.talstra@st.hanze.nl</a>
+                          <a href="mailto:<%= userData.emailadres %>"><%= userData.emailadres %></a>
                         </p>
                       </div>
                     </div>
@@ -190,7 +190,7 @@
                         <span>Mobiele telefoon</span>
                       </label>
                       <div class="col-sm-7">
-                        <p class="form-control-static">+31 6 11 21 27 74</p>
+                        <p class="form-control-static"><%= userData.mobiele_telefoon ? userData.mobiele_telefoon : '-'%></p>
                       </div>
                     </div>
 
@@ -199,7 +199,7 @@
                         <span>Vaste telefoon</span>
                       </label>
                       <div class="col-sm-7">
-                        <p class="form-control-static">-</p>
+                        <p class="form-control-static"><%= userData.vaste_telefoon ? userData.vaste_telefoon : '-' %></p>
                       </div>
                     </div>
 
@@ -209,11 +209,11 @@
                       </label>
                       <div class="col-sm-7">
                         <p class="form-control-static">
-                          Het Blauwgras 23
+                          <%= userData.street_address %>
                           <br />
-                          9203 HJ Drachten
+                          <%= userData.postal_code %> <%= userData.city %>
                           <br />
-                          Nederland
+                          <%= userData.country_name %>
                         </p>
                       </div>
                     </div>
@@ -226,7 +226,7 @@
                         <span>IBAN</span>
                       </label>
                       <div class="col-sm-7">
-                        <p class="form-control-static">NL57 ING B ** ** * **</p>
+                        <p class="form-control-static"><%= userData.redacted_iban %></p>
                       </div>
                     </div>
 
@@ -235,7 +235,7 @@
                         <span>BIC</span>
                       </label>
                       <div class="col-sm-7">
-                        <p class="form-control-static">INGBNL2A</p>
+                        <p class="form-control-static"><%= userData.bic %></p>
                       </div>
                     </div>
                   </fieldset>
@@ -246,7 +246,7 @@
                         <span>Automatische incasso</span>
                       </label>
                       <div class="col-sm-7">
-                        <p class="form-control-static">Je hebt een SEPA machtiging getekend op 3 sep. 2023, met referentie 20230903810810.</p>
+                        <p class="form-control-static">Je hebt een SEPA machtiging getekend op <%= userData.sepa_machtiging_date %>, met referentie <%= userData.sepa_referentie %>.</p>
                       </div>
                     </div>
                   </fieldset>
@@ -401,19 +401,19 @@
                     <legend>Voorwaarden voor het gebruik van online diensten</legend>
                     <p>
                       Je bent akkoord gegaan met de
-                      <a href="/mijn-realtime/profiel/voorwaarden">voorwaarden voor het gebruik van online diensten</a>
+                      <a href="/<%= settings.profileRoute %>/profiel/voorwaarden">voorwaarden voor het gebruik van online diensten</a>
                       op 4 sep. 2023 15:23:49
                     </p>
                   </fieldset>
                 </div>
               </div>
 
-              <a class="btn btn-active btn-primary edit-profile" href="/mijn-realtime/profiel/edit">
+              <a class="btn btn-active btn-primary edit-profile" href="/<%= settings.profileRoute %>/profiel/edit">
                 <i class="fa fa-fw fa-pencil"></i>
                 Profiel bewerken
               </a>
 
-              <a class="btn btn-default" href="/mijn-realtime/profiel/change_password">
+              <a class="btn btn-default" href="/<%= settings.profileRoute %>/profiel/change_password">
                 <i class="fa fa-fw fa-lock"></i>
                 Wijzig wachtwoord
               </a>

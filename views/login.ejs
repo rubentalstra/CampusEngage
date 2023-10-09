@@ -15,7 +15,7 @@
 <body class="no-template">
 
 
-  <%- include('includes/header', {user: user}); %>
+  <%- include('includes/header', {settings, user: user}); %>
 
 
   <section id="content">
@@ -25,7 +25,8 @@
           <div class="row">
             <div class=" col-sm-6 col-md-4 paragraph-text col-md-offset-4 col-sm-offset-3">
               <form action='/login' method='post'>
-                <!-- <input id="csrf_token" name="csrf_token" type="hidden" value="ImRkNDhmNjRiZDNhYzA0NTI0YjU3MDFkMDZkODE5ZDhjODFlN2VmZjgi.ZQ_4Xg.yfzGMKVflimThUiYmTQfG99AUwg"> -->
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
                 <h3>Inloggen</h3>
                 <input autofocus="autofocus" class="form-control form-control-first" id="email" name="email" placeholder="E-mailadres" type="email" value="">
                 <input class="form-control form-control-last" id="password" name="pw" placeholder="Wachtwoord" required type="password" value="">

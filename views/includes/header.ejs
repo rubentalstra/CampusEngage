@@ -7,7 +7,7 @@
           <div class="login">
             <p>
               <% if ( user != undefined) { %>
-              <a href="/mijn-realtime/profiel"><%= user.first_name %> <%= user.primary_last_name_main %></a> | <a href="/logout">Uitloggen</a>
+              <a href="/<%= settings.profileRoute %>/profiel"><%= user.first_name %> <%= user.primary_last_name_main %></a> | <a href="/logout">Uitloggen</a>
               <% } else { %>
               <a href="/login">Inloggen</a>
               <% } %>
@@ -317,25 +317,25 @@
             <a href="/fotos" title="" target="_self">Foto&#39;s</a>
           </li>
           <li>
-            <a href="/mijn-realtime" title="" target="_self">Mijn RealTime</a>
+            <a href="/<%= settings.profileRoute %>" title="" target="_self">Mijn RealTime</a>
             <ul>
               <li>
-                <a href="/mijn-realtime/profiel" title="" target="_self">Profiel</a>
+                <a href="/<%= settings.profileRoute %>/profiel" title="" target="_self">Profiel</a>
               </li>
               <li>
-                <a href="/mijn-realtime/groepen" title="" target="_self">Groepen</a>
+                <a href="/<%= settings.profileRoute %>/groepen" title="" target="_self">Groepen</a>
               </li>
               <li>
-                <a href="/mijn-realtime/smoelenboek" title="" target="_self">Smoelenboek</a>
+                <a href="/<%= settings.profileRoute %>/smoelenboek" title="" target="_self">Smoelenboek</a>
               </li>
               <li>
-                <a href="/mijn-realtime/merchandise" title="" target="_self">Merchandise</a>
+                <a href="/<%= settings.profileRoute %>/merchandise" title="" target="_self">Merchandise</a>
               </li>
               <li>
-                <a href="/mijn-realtime/agenda" title="" target="_self">Agenda</a>
+                <a href="/<%= settings.profileRoute %>/agenda" title="" target="_self">Agenda</a>
               </li>
               <li>
-                <a href="/mijn-realtime/uitschrijven" title="" target="_self">Uitschrijven</a>
+                <a href="/<%= settings.profileRoute %>/uitschrijven" title="" target="_self">Uitschrijven</a>
               </li>
             </ul>
           </li>
@@ -354,7 +354,7 @@
           <div class="login">
             <p>
               <% if ( user != undefined) { %>
-              <a href="/mijn-realtime/profiel"><%= user.first_name %> <%= user.primary_last_name_main %></a> | <a href="/logout">Uitloggen</a>
+              <a href="/<%= settings.profileRoute %>/profiel"><%= user.first_name %> <%= user.primary_last_name_main %></a> | <a href="/logout">Uitloggen</a>
               <% } else { %>
               <a href="/login">Inloggen</a>
               <% } %>

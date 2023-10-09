@@ -19,6 +19,10 @@ require('dotenv').config({ path: `./env/.env` });
 const app = express();
 
 
+const settingsPath = path.join(__dirname, 'settings.json');
+let settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+
+
 // app.use(
 //     helmet({
 //         frameguard: {
@@ -89,7 +93,8 @@ const limiter = rateLimit({
 
 // Apply the rate limiting middleware to all requests
 app.use(limiter);
-app.use('/admin', adminRouter);
+const router = adminRouter(settings);
+app.use('/admin', router);
 
 // HTTPS server setup
 const options = {

@@ -1,0 +1,16 @@
+{
+    "profileRoute": "my-profile",
+    "M2FANAME": "SV-REALTIME",
+    "colorPalette": {
+        "normal": {
+            "normal": "#007bff",
+            "dark": "#0056b3",
+            "darker": "#004085"
+        },
+        "border": {
+            "normal": "#007bff",
+            "dark": "#0056b3",
+            "darker": "#004085"
+        }
+    }
+}

@@ -18,14 +18,14 @@
 
 <body class="template-content webpage-5437 module-profile authenticated-user">
 
-  <%- include('../includes/header', {user: user}); %>
+  <%- include('../includes/header', {settings, user: user}); %>
 
 
   <section id="content">
     <div class="content-header content-header-background">
       <div class="container">
         <ol class="breadcrumb">
-          <li><a href="/mijn-realtime">Mijn RealTime</a></li>
+          <li><a href="/<%= settings.profileRoute %>">Mijn RealTime</a></li>
           <li class="active">2FA Settings</li>
         </ol>
         <h2>Two-Factor Authentication Settings</h2>
@@ -36,33 +36,33 @@
         <div class="aside col-md-3">
           <ul id="submenu">
             <li>
-              <a href="/mijn-realtime/profiel" title="">Profiel</a>
+              <a href="/<%= settings.profileRoute %>/profiel" title="">Profiel</a>
               <ul>
                 <li class="active">
-                  <a href="/mijn-realtime/profiel/2fa" title="">2FA Settings</a>
+                  <a href="/<%= settings.profileRoute %>/profiel/2fa" title="">2FA Settings</a>
                 <li>
                 <li>
-                  <a href="/mijn-realtime/profiel/groepen" title="">Mijn groepen</a>
+                  <a href="/<%= settings.profileRoute %>/profiel/groepen" title="">Mijn groepen</a>
                 <li>
-                  <a href="/mijn-realtime/profiel/evenementen" title="">Mijn evenementen</a>
+                  <a href="/<%= settings.profileRoute %>/profiel/evenementen" title="">Mijn evenementen</a>
                 <li>
-                  <a href="/mijn-realtime/profiel/facturen" title="">Mijn facturen</a>
+                  <a href="/<%= settings.profileRoute %>/profiel/facturen" title="">Mijn facturen</a>
               </ul>
             </li>
             <li>
-              <a href="/mijn-realtime/groepen" title="">Groepen</a>
+              <a href="/<%= settings.profileRoute %>/groepen" title="">Groepen</a>
             </li>
             <li>
-              <a href="/mijn-realtime/smoelenboek" title="">Smoelenboek</a>
+              <a href="/<%= settings.profileRoute %>/smoelenboek" title="">Smoelenboek</a>
             </li>
             <li>
-              <a href="/mijn-realtime/merchandise" title="">Merchandise</a>
+              <a href="/<%= settings.profileRoute %>/merchandise" title="">Merchandise</a>
             </li>
             <li>
-              <a href="/mijn-realtime/agenda" title="">Agenda</a>
+              <a href="/<%= settings.profileRoute %>/agenda" title="">Agenda</a>
             </li>
             <li>
-              <a href="/mijn-realtime/uitschrijven" title="">Uitschrijven</a>
+              <a href="/<%= settings.profileRoute %>/uitschrijven" title="">Uitschrijven</a>
             </li>
           </ul>
         </div>
@@ -71,10 +71,10 @@
             <div class="col-md-12 paragraph-text paragraph-text-view">
               <% if(user.hasFA) { %>
               <p>You have already set up Two-Factor Authentication for added security. If you'd like to remove it:</p>
-              <a href="/mijn-realtime/remove-2fa" class="btn btn-danger">Remove 2FA</a>
+              <a href="/<%= settings.profileRoute %>/remove-2fa" class="btn btn-danger">Remove 2FA</a>
               <% } else { %>
               <p>Enhance the security of your account by setting up Two-Factor Authentication.</p>
-              <a href="/mijn-realtime/setup-2fa" class="btn btn-primary">Setup 2FA</a>
+              <a href="/<%= settings.profileRoute %>/setup-2fa" class="btn btn-primary">Setup 2FA</a>
               <% } %>
             </div>
           </div>

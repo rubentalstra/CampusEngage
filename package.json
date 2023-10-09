@@ -18,6 +18,7 @@
     "bootstrap": "^5.3.2",
     "cookie-parser": "^1.4.6",
     "cron": "^3.0.0",
+    "csrf-csrf": "^3.0.1",
     "datatables.net-bs5": "^1.13.6",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",

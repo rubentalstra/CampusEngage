@@ -15,7 +15,7 @@
 <body class="no-template">
 
 
-  <%- include('../../includes/header', {user: user}); %>
+  <%- include('../../includes/header', {settings, user: user}); %>
 
 
   <section id="content">
@@ -25,8 +25,8 @@
           <div class="row">
             <div class="col-sm-6 col-md-4 paragraph-text col-md-offset-4 col-sm-offset-3">
               <h2>Enter Two-Factor Authentication Token</h2>
-              <form action="/mijn-realtime/check-2fa" method="post">
-                <!-- <input id="csrf_token" name="csrf_token" type="hidden" value="ImRkNDhmNjRiZDNhYzA0NTI0YjU3MDFkMDZkODE5ZDhjODFlN2VmZjgi.ZQ_4Xg.yfzGMKVflimThUiYmTQfG99AUwg"> -->
+              <form action="/<%= settings.profileRoute %>/check-2fa" method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
                 <label for="token">Enter the token from your 2FA application:</label>
                 <input type="text" id="token" name="token" required class="form-control form-control-first">
