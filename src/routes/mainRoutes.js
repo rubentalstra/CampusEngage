@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { getHomePage, getLidWordenCountriesInformation, getEvents, getAttendanceForEvent, getEventDetails, getIfUserHasBoughtTicket, getMyTicketsForEvent } = require('../controller/mainController');
 const passportUser = require('../config/passportUsers');
 const userRouter = require('./userRoutes');
 const connection = require('../config/database');
@@ -16,10 +15,10 @@ const fs = require('fs');
 
 const sequelize = require('../config/database-pages');
 const { ensureAuthenticatedUser, userEnsure2fa } = require('../middleware/auth');
-const { webhookVerification, createRefundPayment, } = require('../utilities/mollie');
-const { createOrder } = require('../utilities/order');
-const { getCalendarJson } = require('../controller/user/api');
+const { webhookVerification } = require('../utilities/mollie');
+
 const eventRouter = require('./event/eventRoutes');
+const { getCssStyles } = require('../controller/css');
 
 
 
@@ -52,6 +51,7 @@ function initRouter(settings) {
             // console.log(req.session);
             // console.log(req.user);
             req.session.userType = 'user';
+            res.locals.settings = settings;
             next(); // Proceed to the next middleware or route handler
         }
     });
@@ -64,24 +64,7 @@ function initRouter(settings) {
     });
 
 
-    router.get('/styles.css', (req, res) => {
-        const cssPath = path.join(__dirname, '../../public/css/zmefuq_main.css');
-        let css = fs.readFileSync(cssPath, 'utf8');
-        // Replace the old color with the new one from settings
-        // Replace colors with those from settings
-        const palette = settings.colorPalette.normal;
-        css = css.replace(/#e50045/g, palette.normal);
-        css = css.replace(/#cc003d/g, palette.dark);
-        css = css.replace(/#b20036/g, palette.darker);
-
-        const borderPalette = settings.colorPalette.border;
-        css = css.replace(/#cc003d/g, borderPalette.normal);
-        css = css.replace(/#8e002b/g, borderPalette.dark);
-        css = css.replace(/#99002e/g, borderPalette.darker);
-
-        res.type('text/css');
-        res.send(css);
-    });
+    router.get('/styles.css', getCssStyles);
 
 
 

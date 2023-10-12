@@ -25,7 +25,7 @@ exports.getEventsTicketsPage = async (req, res) => {
       `, [EventID, MemberID]), query(`SELECT * FROM Tickets WHERE EventID = ?`, [EventID]), query(`SELECT * FROM Events WHERE EventID = ?`, [EventID])]);
 
 
-        return res.render('evenementen/confirm', { hasTicket: result[0], tickets: tickets, event: event[0], nonce: res.locals.cspNonce });
+        return res.render('evenementen/confirm', { settings: res.locals.settings, hasTicket: result[0], tickets: tickets, event: event[0], nonce: res.locals.cspNonce });
         // return result[0];  // return ID of the new record
     } catch (error) {
         console.error(error);

@@ -25,7 +25,10 @@
       </ol>
 
       <div class="carousel-inner" role="listbox">
-        <div class="item active">
+        <!-- "index": {
+          "carousel": [ -->
+        <% for( let index = 0; index < settings.index.carousel.length; index++ ) { %>
+        <div class="item <%= index == 0 ?'active' : ''  %>">
           <img src="/img/banner-slider/eabf56fdf9c34a74a00343f4353a9fd8.jpg" alt="Welkom bij studievereniging RealTime!" class="full">
           <div class="container carousel-container">
             <div class="carousel-caption">
@@ -38,6 +41,23 @@
             </div>
           </div>
         </div>
+
+
+        <% } %>
+
+        <!-- <div class="item active">
+          <img src="/img/banner-slider/eabf56fdf9c34a74a00343f4353a9fd8.jpg" alt="Welkom bij studievereniging RealTime!" class="full">
+          <div class="container carousel-container">
+            <div class="carousel-caption">
+              <h2>
+                <i>Welkom bij studievereniging RealTime!</i>
+              </h2>
+              <p>
+                <i>De studievereniging voor HBO-ICT</i>
+              </p>
+            </div>
+          </div>
+        </div> -->
         <div class="item">
           <img src="/img/banner-slider/5fa207db08ca42d9b7e2f007a2f796d8.jpg" alt="Lastig tentamen? Interesse in meer?" class="full">
           <div class="container carousel-container">

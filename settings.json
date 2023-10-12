@@ -1,4 +1,6 @@
 {
+    "siteName": "RealTime",
+    "siteLogo": "logo-sv-realtime-sm.png",
     "profileRoute": "my-profile",
     "M2FANAME": "SV-REALTIME",
     "colorPalette": {
@@ -12,5 +14,24 @@
             "dark": "#0056b3",
             "darker": "#004085"
         }
+    },
+    "index": {
+        "carousel": [
+            {
+                "img": "eabf56fdf9c34a74a00343f4353a9fd8.jpg",
+                "H2": "Welkom bij studievereniging RealTime!",
+                "P": "De studievereniging voor HBO-ICT"
+            },
+            {
+                "img": "5fa207db08ca42d9b7e2f007a2f796d8.jpg",
+                "H2": "Lastig tentamen? Interesse in meer?",
+                "P": "Dat kan! Met ons &#39;Study Support&#39; helpen we jou waar nodig. Ook organiseren we workshops en lezingen."
+            },
+            {
+                "img": "Vossenjacht_introkamp_19-20.jpeg",
+                "H2": "Word lid!",
+                "P": "En neem deel aan verschillende toffe evenementen!"
+            }
+        ]
     }
 }
