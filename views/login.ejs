@@ -24,7 +24,7 @@
         <div class="paragraphs col-md-12">
           <div class="row">
             <div class=" col-sm-6 col-md-4 paragraph-text col-md-offset-4 col-sm-offset-3">
-              <form action='/login' method='post'>
+              <form action='/login?next=<%= next ?? '' %>' method='post'>
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
                 <h3>Inloggen</h3>

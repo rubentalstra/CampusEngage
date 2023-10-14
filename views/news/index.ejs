@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>RealTime - Evenementen</title>
+
+  <%- include('../includes/meta', {}); %>
+
+  <%- include('../includes/headLink', {}); %>
+
+  <style>
+    .content-header-background {
+      background-image: url('/img/banners/9094706bfd344c3cbbbffcc6d7fe3d0a-lg.png');
+    }
+  </style>
+</head>
+
+<body class="template-content webpage-5437 module-profile authenticated-user">
+
+  <%- include('../includes/header', {settings, user: user}); %>
+
+  <section id="content">
+    <div class="content-header content-header-background">
+      <div class="container">
+        <ol class="breadcrumb">
+          <li class="active">Nieuws</li>
+        </ol>
+        <h2>Nieuws</h2>
+      </div>
+    </div>
+    <div class="container">
+
+
+      <div class="row">
+        <div class="paragraphs col-md-12">
+          <div class="row">
+            <div class=" col-md-12 paragraph-text">
+              <nav>
+                <ul class="pager">
+                  <li class="previous <%= currentPage <= 1 ? 'disabled' : '' %>">
+                    <a href="<%= currentPage > 1 ? `/nieuws/page/${currentPage - 1}` : '#' %>" class="btn btn-sm btn-default <%= currentPage <= 1 ? 'disabled' : '' %>"><span aria-hidden="true">←</span> Vorige</a>
+                  </li>
+                  <li class="page-amount"><%= currentPage %> van <%= maxPage %></li>
+                  <li class="next <%= currentPage >= maxPage ? 'disabled' : '' %>">
+                    <a href="<%= currentPage < maxPage ? `/nieuws/page/${currentPage + 1}` : '#' %>" class="btn btn-sm btn-default <%= currentPage >= maxPage ? 'disabled' : '' %>">Volgende <span aria-hidden="true">→</span></a>
+                  </li>
+                </ul>
+              </nav>
+
+
+              <% articles.forEach((article) => { %>
+              <div class="row publication-item">
+                <% if(article.image_path) { %>
+                <div class="col-sm-5">
+                  <div class="embed-responsive embed-responsive-16by9">
+                    <a href="/nieuws/<%= article.url %>">
+                      <img src="<%= article.image_path %>" class="embed-responsive-img" alt="<%= article.title %>">
+                    </a>
+                  </div>
+                </div>
+                <div class="col-sm-7">
+                  <% } else { %>
+                  <div class="col-sm-12">
+                    <% } %>
+                    <ul class="list-unstyled list-inline text-muted small">
+                      <li><span class="fa fa-calendar"></span> <time data-datetime="<%= article.date %>"><%= article.dateString %></time></li>
+                      <li><span class="fa fa-comments"></span> <a href="/nieuws/<%= article.url %>#comments">0 reacties</a></li>
+                    </ul>
+                    <h3><a href="/nieuws/<%= article.url %>"><%= article.title %></a></h3>
+                    <p><%= article.content %></p>
+                    <p><a class="btn btn-sm btn-primary pull-right" href="/nieuws/<%= article.url %>"><i class="fa fa-fw fa-chevron-circle-right"></i> Lees meer</a></p>
+                  </div>
+                </div>
+                <div class="clearfix margin-bottom-20">
+                  <hr>
+                </div>
+                <% }); %>
+
+
+
+                <!-- <div class="row publication-item">
+                <div class="col-sm-5">
+                  <div class="embed-responsive embed-responsive-16by9">
+                    <a href="/nieuws/kerstborrel">
+                      <img src="https://congressus-svtapp.s3-eu-west-1.amazonaws.com/files/a20ced3e0d1b4ecb907ad236fb01dc32.jpeg" class="embed-responsive-img" alt="Kerstborrel">
+                    </a>
+                  </div>
+                </div>
+                <div class="col-sm-7">
+                  <ul class="list-unstyled list-inline text-muted small">
+                    <li><span class="fa fa-calendar"></span> <time data-datetime="2022-12-22 22:00:00">10 maanden geleden</time></li>
+                  </ul>
+                  <h3><a href="/nieuws/kerstborrel">Kerstborrel</a></h3>
+                  <p>Om de kerstvakantie in te luiden hebben wij op 22 december een kerstborrel in de Stokerij gehad. De borrel was van 21:00 tot 23:00, en de eerste 100 biertjes waren gratis! Wij hebben weer hele...</p>
+                  <p> <a class="btn btn-sm btn-primary pull-right" href="/nieuws/kerstborrel"><i class="fa fa-fw fa-chevron-circle-right"></i> Lees meer</a></p>
+                </div>
+              </div>
+              <div class="clearfix margin-bottom-20">
+                <hr>
+              </div> -->
+
+                <nav>
+                  <ul class="pager">
+                    <li class="previous <%= currentPage <= 1 ? 'disabled' : '' %>">
+                      <a href="<%= currentPage > 1 ? `/nieuws/page/${currentPage - 1}` : '#' %>" class="btn btn-sm btn-default <%= currentPage <= 1 ? 'disabled' : '' %>"><span aria-hidden="true">←</span> Vorige</a>
+                    </li>
+                    <li class="page-amount"><%= currentPage %> van <%= maxPage %></li>
+                    <li class="next <%= currentPage >= maxPage ? 'disabled' : '' %>">
+                      <a href="<%= currentPage < maxPage ? `/nieuws/page/${currentPage + 1}` : '#' %>" class="btn btn-sm btn-default <%= currentPage >= maxPage ? 'disabled' : '' %>">Volgende <span aria-hidden="true">→</span></a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+
+
+
+          <%- include('../includes/partners.ejs'); %>
+        </div>
+
+
+
+
+      </div>
+  </section>
+
+
+
+  <%- include('../includes/footer'); %>
+
+  <!-- generic javascript -->
+
+  <script src="/js/dist/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/jquery.cycle2.min.js"></script>
+
+  <!-- template javascript -->
+  <script src="/js/superfish-e25125463e3a68f85b0683f3bc21433b.js"></script>
+  <script src="/js/main-aac80d816f26db8660321cb022f841b1.js"></script>
+
+
+  <script nonce="<%= nonce %>">
+    document.addEventListener("DOMContentLoaded", function() {
+      let currentPath = window.location.pathname.split("/")[1]; // get the highest level of the path
+      let nav = document.querySelector(".header-nav");
+      let links = nav.querySelectorAll("a");
+
+      links.forEach(function(link) {
+        if (link.getAttribute("href").split("/")[1] === currentPath) {
+          link.parentElement.classList.add("path");
+        }
+      });
+    });
+  </script>
+
+
+
+
+</body>
+
+</html>

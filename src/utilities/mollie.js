@@ -26,7 +26,7 @@ async function updateRefundStatus() {
         const updatePromises = refunds.map(async refund => {
             try {
                 const mollieResponse = await mollieClient.paymentRefunds.get(refund.MollieID, { paymentId: refund.TransactionMollieID });
-                console.log(mollieResponse);
+                // console.log(mollieResponse);
 
                 if (mollieResponse) {
                     await query('UPDATE Refunds SET RefundStatus = ? WHERE RefundID = ?', [mollieResponse.status, refund.RefundID]);
@@ -66,13 +66,14 @@ function createMolliePayment(order, amount, req, res) {
         amount: { currency: order.Currency, value: amount.toString() },
         description: order.Description,
         redirectUrl: `${process.env.MOLLIE_URL}/`,
-        webhookUrl: `${process.env.MOLLIE_URL}/webhook?orderId=${order.OrderID}`,
+        webhookUrl: `${process.env.MOLLIE_URL}/evenementen/webhook?orderId=${order.OrderID}`,
         metadata: { orderId: order.OrderID },
     };
 
     mollieClient.payments.create(paymentData)
         .then(payment => {
-            res.redirect(payment.getCheckoutUrl());
+            // res.redirect(payment.getCheckoutUrl());
+            res.json({ url: payment.getCheckoutUrl() });
         })
         .catch(error => {
             console.error(error);
@@ -88,7 +89,7 @@ function webhookVerification(req, res) {
     mollieClient.payments.get(req.body.id)
         .then(async payment => {
 
-            console.log(payment);
+            // console.log(payment);
 
             switch (payment.status) {
                 case PaymentStatus.paid: {
@@ -160,7 +161,7 @@ async function createRefundPayment(req, res) {
 
 
 
-        console.log(totalRefundAmount.toString());
+        // console.log(totalRefundAmount.toString());
 
         const orderId = await generateOrderID();
 

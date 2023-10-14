@@ -954,7 +954,7 @@
           <%= event.Name %>
         </h2>
 
-        <form class="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start xl:gap-x-16" method="post">
+        <form id="ticketOrderForm" class="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start xl:gap-x-16" method="post">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
           <section aria-labelledby="cart-options" class="lg:col-span-7">
@@ -1335,6 +1335,78 @@
           // console.log(ticketPrice)
           updateSidebar(ticketID, parseInt(this.value, 10), ticketPrice);
         });
+      });
+
+
+
+
+      document.getElementById('ticketOrderForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+
+        const ticketSelectors = document.querySelectorAll('.ticket-select');
+        const attendees = [];
+
+        ticketSelectors.forEach(select => {
+          const ticketID = select.dataset.ticketId;
+          const count = parseInt(select.value, 10);
+
+          if (count > 0) {
+            for (let i = 0; i < count; i++) {
+              const attendee = {
+                TicketID: ticketID,
+                GuestName: null
+              };
+
+              const guestNamesDiv = document.getElementById(`guestNames${ticketID}`);
+              if (guestNamesDiv) {
+                const inputs = guestNamesDiv.querySelectorAll('input');
+                if (inputs && inputs[i]) {
+                  attendee.GuestName = inputs[i].value || null;
+                }
+              }
+
+              attendees.push(attendee);
+            }
+          }
+        });
+
+        // Now you can submit the form manually or via fetch API or any other way you prefer.
+        // For this example, we will use fetch API:
+        // console.log(attendees)
+
+        // // Get data from the form including the _csrf token
+        const formData = new FormData(e.target);
+        formData.append('attendees', JSON.stringify(attendees));
+
+        // console.log(formData)
+        const formDataObj = {};
+        formData.forEach((value, key) => {
+          formDataObj[key] = value;
+        });
+        console.log(formDataObj);
+
+
+
+        $.ajax({
+          url: '/evenementen/<%= event.EventID %>/sign-up',
+          type: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'CSRF-Token': '<%= csrfToken %>' // Adjust the header name based on your server's configuration
+          },
+          data: JSON.stringify(formDataObj),
+          success: function(response) {
+            console.log('Success:', response);
+            window.location.href = response.url; // This will handle the redirection
+          },
+          error: function(error) {
+            console.error('Error:', error);
+          }
+        });
+
+
+
       });
     });
   </script>

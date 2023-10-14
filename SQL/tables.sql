@@ -120,3 +120,15 @@ CREATE TABLE `Refunds` (
   KEY `fk_Refunds_Transactions` (`TransactionID`),
   CONSTRAINT `fk_Refunds_Transactions` FOREIGN KEY (`TransactionID`) REFERENCES `Transactions` (`TransactionID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `newsArticles` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `image_path` varchar(255) NOT NULL,
+  `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `content` text NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `url` (`url`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;;

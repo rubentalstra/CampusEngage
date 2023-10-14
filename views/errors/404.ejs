@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>RealTime</title>
+
+  <%- include('../includes/meta', {}); %>
+
+  <%- include('../includes/headLink', {}); %>
+
+</head>
+
+<body class="template-content webpage-5437 module-profile authenticated-user">
+
+  <%- include('../includes/header', {settings, user: user}); %>
+
+
+  <section id="content">
+    <div class="container">
+      <div class="row">
+        <div class="paragraphs col-md-12">
+          <div class="row">
+            <div class=" col-md-12 paragraph-text">
+              <h2>Oh oh!</h2>
+              <p>Je zocht naar een speld in onze hooiberg. We konden hem helaas niet vinden. Excuus..</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <%- include('../includes/footer'); %>
+
+  <!-- generic javascript -->
+
+  <script src="/js/dist/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/jquery.cycle2.min.js"></script>
+
+  <!-- template javascript -->
+  <script src="/js/superfish-e25125463e3a68f85b0683f3bc21433b.js"></script>
+  <script src="/js/main-aac80d816f26db8660321cb022f841b1.js"></script>
+
+
+  <script nonce="<%= nonce %>">
+    document.addEventListener("DOMContentLoaded", function() {
+      let currentPath = window.location.pathname.split("/")[1]; // get the highest level of the path
+      let nav = document.querySelector(".header-nav");
+      let links = nav.querySelectorAll("a");
+
+      links.forEach(function(link) {
+        if (link.getAttribute("href").split("/")[1] === currentPath) {
+          link.parentElement.classList.add("path");
+        }
+      });
+    });
+  </script>
+
+
+
+
+</body>
+
+</html>

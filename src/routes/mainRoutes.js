@@ -11,14 +11,13 @@ const { v4: uuidv4 } = require('uuid'); // Ensure you have the 'uuid' package in
 const Page = require('../models/page');
 
 const path = require('path');
-const fs = require('fs');
-
-const sequelize = require('../config/database-pages');
 const { ensureAuthenticatedUser, userEnsure2fa } = require('../middleware/auth');
-const { webhookVerification } = require('../utilities/mollie');
 
 const eventRouter = require('./event/eventRoutes');
 const { getCssStyles } = require('../controller/css');
+const isValidRedirectURL = require('../utilities/isValidRedirectURL');
+const { fetchAndRenderArticles, fetchAndRenderArticleDetails, insertArticle, fetchArticlesForFooter } = require('../utilities/newsFunctions');
+
 
 
 
@@ -30,9 +29,19 @@ function initRouter(settings) {
     // });
 
 
+    const getRedirectURL = (req) => {
+        // Default behavior
+        let redirectTo = `/${settings.profileRoute}/profiel`;
+
+        // Validate the next URL from query parameter
+        if (req.query.next && isValidRedirectURL(req.query.next)) {
+            redirectTo = req.query.next;
+        }
+        return redirectTo;
+    };
 
 
-    router.use((req, res, next) => {
+    router.use(async (req, res, next) => {
         if (!req.session.userAgent) {
             req.session.userAgent = req.headers['user-agent'];
         }
@@ -52,6 +61,7 @@ function initRouter(settings) {
             // console.log(req.user);
             req.session.userType = 'user';
             res.locals.settings = settings;
+            res.locals.news = await fetchArticlesForFooter(req, res);
             next(); // Proceed to the next middleware or route handler
         }
     });
@@ -59,8 +69,9 @@ function initRouter(settings) {
 
 
 
-    router.get('/', (req, res, next) => {
-        res.render('index', { settings, nonce: res.locals.cspNonce, user: req.user });
+
+    router.get('/', async (req, res, next) => {
+        res.render('index', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user });
     });
 
 
@@ -74,13 +85,47 @@ function initRouter(settings) {
     });
 
 
-    router.post('/evenementen/webhook', webhookVerification);
     router.use('/evenementen', ensureAuthenticatedUser, userEnsure2fa, eventRouter(settings));
+
+    // nieuws
+
+    router.get('/nieuws', (req, res) => {
+        const currentPage = 1;
+        fetchAndRenderArticles(settings, currentPage, req, res);
+    });
+
+    router.get('/nieuws/create', (req, res) => {
+        const newArticle = {
+            title: 'Your Article Title',
+            image_path: '/uploads/news/463e37fa67d54963af77d2ba1ed6b850.jpg',
+            content: 'Your article content here'
+        };
+
+        insertArticle(newArticle, results => {
+            console.log('Article inserted with ID:', results.insertId);
+        });
+    });
+
+    router.get('/nieuws/:url', (req, res) => {
+        const articleUrl = req.params.url;
+        fetchAndRenderArticleDetails(articleUrl, settings, req, res);
+    });
+
+
+    router.get('/nieuws/page/:page', (req, res) => {
+        const currentPage = parseInt(req.params.page, 10) || 1;
+        fetchAndRenderArticles(settings, currentPage, req, res);
+    });
+
+
+
+
+    // END NEWS
 
 
 
     router.get('/contact', (req, res, next) => {
-        res.render('contact', { settings, nonce: res.locals.cspNonce, user: req.user });
+        res.render('contact', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user });
     });
 
     router.use(`/${settings.profileRoute}`, userRouter(settings));
@@ -99,6 +144,7 @@ function initRouter(settings) {
 
             res.render('lid-worden/lid-worden', {
                 settings,
+                footerNews: res.locals.news,
                 nonce: res.locals.cspNonce,
                 user: undefined,
                 countries: countries
@@ -114,7 +160,7 @@ function initRouter(settings) {
             const parentPages = await Page.findAll();
 
             // Render the form
-            res.render('page-create', { settings, nonce: res.locals.cspNonce, parentPages });
+            res.render('page-create', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, parentPages });
         } catch (error) {
             console.error('Error fetching parent pages:', error);
             res.status(500).send('Server error');
@@ -161,7 +207,7 @@ function initRouter(settings) {
             return res.status(404).send('Page not found');
         }
 
-        res.render('layout', { settings, nonce: res.locals.cspNonce, page, pages });
+        res.render('layout', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, page, pages });
     });
 
     // END test create pages
@@ -224,24 +270,39 @@ function initRouter(settings) {
     });
 
 
-
     router.get('/login', (req, res, next) => {
-        res.render('login', { settings, nonce: res.locals.cspNonce, user: undefined });
+        // If the user doesn't have 2FA or has already verified it, proceed to the intended path or default
+        if (req.user && (!req.user.hasFA || req.session.is2faVerified)) {
+            return res.redirect(getRedirectURL(req));
+        }
+
+        // If none of the above conditions met, Go to Login Page
+        res.render('login', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, next: req.query.next, user: undefined });
     });
 
-    // Adjusting the login success route:
+
     router.post('/login', passportUser.authenticate('local-user', {
         failureRedirect: '/login-failure',
-        successRedirect: `/${settings.profileRoute}/prompt-2fa`,
         failureFlash: true
     }), (req, res, next) => {
-        req.session.regenerate(function (err) {
-            // will have a new session here
-            res.redirect(`/${settings.profileRoute}/prompt-2fa`);
-        });
+        // Redirect to /login-success with the next parameter if authentication was successful
+        if (req.isAuthenticated()) {
+            return res.redirect(`/login-success?next=${encodeURIComponent(req.query.next || '')}`);
+        }
+        // If not authenticated, handle accordingly (e.g., send a failure message or redirect)
+        res.redirect('/login-failure');
     });
 
+    router.get('/login-success', ensureAuthenticatedUser, (req, res, next) => {
 
+        // If the user doesn't have 2FA or has already verified it, proceed to the intended path or default
+        if (!req.user.hasFA || req.session.is2faVerified) {
+            return res.redirect(getRedirectURL(req));
+        }
+
+        // If none of the above conditions met, prompt for 2FA
+        res.redirect(`/${settings.profileRoute}/prompt-2fa`);
+    });
 
     router.get('/login-failure', (req, res, next) => {
         res.send('You entered the wrong password.');
@@ -257,7 +318,7 @@ function initRouter(settings) {
     });
 
     router.get('/password/forgot', (req, res) => {
-        res.render('reset-password', { settings, nonce: res.locals.cspNonce, user: undefined });
+        res.render('reset-password', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: undefined });
     });
 
     router.post('/password/forgot', (req, res) => {
@@ -312,7 +373,7 @@ function initRouter(settings) {
 
     router.get('/register', (req, res, next) => {
         console.log('Inside get');
-        res.render('register', { settings, nonce: res.locals.cspNonce });
+        res.render('register', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce });
 
     });
 
@@ -367,7 +428,7 @@ function initRouter(settings) {
     });
 
     router.get('/pending-approval', (req, res) => {
-        res.render(`my-profile/pending-approval`, { settings, nonce: res.locals.cspNonce });
+        res.render(`my-profile/pending-approval`, { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce });
     });
 
 

@@ -139,6 +139,7 @@
                 <h4>Deelnemers <small>– <strong><%= attendance.reduce((n, {Tickets}) => n + Tickets, 0) %></strong><span class="small text-muted"> / <%= eventDetails.AvailableQuantity %> </span></small></h4>
               </div>
 
+              <% if (user) { %>
               <% if (attendance) { %>
               <ul class="list-inline">
                 <% attendance.forEach(element => { %>
@@ -147,7 +148,57 @@
                 <!-- <li class="col-xs-12 col-sm-6 col-md-4 margin-bottom-10 truncate"> <a href="/mijn-realtime/smoelenboek/598334">N. (Nik) van der Ree</a> <span class="text-muted small">(1x)</span> </li> -->
               </ul>
               <% } %>
+              <% } else {%>
+              <p>Je moet <a href="/login?next=https://localhost:8443/evenementen/6">ingelogd</a> zijn om alle deelnemers te zien</p>
+              <% }%>
             </div>
+
+
+
+            <!-- START Comments -->
+            <div class=" col-md-12 paragraph-text">
+              <div class="comments-container">
+                <div class="headline margin-top-20">
+                  <h4 id="comments">Reacties</h4>
+                </div>
+
+                <ul class="media-list">
+                  <li class="media">
+                    <!-- <a class="pull-left media-object img-rounded" href="/mijn-realtime/smoelenboek/275724">
+                      <img src="https://congressus-sv-realtime.s3-eu-west-1.amazonaws.com/members/5fd3271244494ef1817a9a6941beaca1-sm.jpg" alt="Johan Schuringa">
+                    </a> -->
+                    <div class="pull-left media-object img-rounded icon">
+                      <i class="fa fa-user"></i>
+                    </div>
+
+                    <div class="media-body">
+                      <div class="pull-right text-muted"><time data-datetime="2020-11-16 17:41:16">3 jaar geleden</time></div>
+                      <h4 class="media-heading">Johan Schuringa</h4>
+                      <p>Succes dit jaar!</p>
+                    </div>
+                  </li>
+                </ul>
+
+                <form name="form" method="post" class="form" action="">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                  <ul class="media-list">
+                    <li class="media">
+                      <div class="pull-left media-object img-rounded icon">
+                        <i class="fa fa-user"></i>
+                      </div>
+                      <div class="media-body">
+                        <h4 class="media-heading"><%= user.first_name %> <%= user.primary_last_name_main %></h4>
+                        <div class="form-group">
+                          <input type="text" class="form-control" name="comment" placeholder="Schrijf een reactie...">
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </form>
+              </div>
+            </div>
+            <!-- END Comments -->
           </div>
         </div>
 

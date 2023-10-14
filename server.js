@@ -12,7 +12,7 @@ const cookieParser = require('cookie-parser');
 const { doubleCsrf } = require('csrf-csrf');
 
 const { CronJob } = require('cron');
-const { updateRefundStatus } = require('./src/utilities/mollie');
+const { updateRefundStatus, webhookVerification } = require('./src/utilities/mollie');
 const initRouter = require('./src/routes/mainRoutes');
 const MySQLStore = require('express-mysql-session')(session);
 
@@ -32,6 +32,7 @@ let settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 app.disable('x-powered-by');
+app.set('trust proxy', 1);
 
 
 // Static files
@@ -57,7 +58,7 @@ app.use(helmet({
         directives: {
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
             'script-src': ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`],
-            'connect-src': ["'self'"]
+            'connect-src': ["'self'", 'https://www.mollie.com']
         }
     }
 }));
@@ -99,6 +100,9 @@ const limiter = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 app.use(limiter);
+
+// Define the Mollie webhook route before the CSRF middleware
+app.post('/evenementen/webhook', webhookVerification);
 
 // Set up cookie parser and use it before csurf
 app.use(cookieParser(process.env.CSRF));

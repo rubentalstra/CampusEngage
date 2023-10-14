@@ -20,7 +20,7 @@ function userRouter(settings) {
 
 
     router.get('/user-dashboard', ensureAuthenticatedUser, userEnsure2fa, (req, res, next) => {
-        res.render('my-profile/user-dashboard', { settings, nonce: res.locals.cspNonce, user: req.user });
+        res.render('my-profile/user-dashboard', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user });
     });
 
 
@@ -29,7 +29,7 @@ function userRouter(settings) {
     router.get('/set-password', (req, res) => {
         const token = req.query.token;
         // Render the password setting form page, passing the token along
-        res.render('my-profile/set-password', { settings, nonce: res.locals.cspNonce, token: token });
+        res.render('my-profile/set-password', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, token: token });
     });
 
 
@@ -76,6 +76,7 @@ function userRouter(settings) {
     router.get('/profiel/2fa', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
         res.render('my-profile/2fa', {
             settings,
+            footerNews: res.locals.news,
             nonce: res.locals.cspNonce,
             user: req.user,
         });
@@ -84,6 +85,7 @@ function userRouter(settings) {
     router.get('/uitschrijven', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
         res.render('my-profile/uitschrijven', {
             settings,
+            footerNews: res.locals.news,
             nonce: res.locals.cspNonce,
             user: req.user,
         });
@@ -92,6 +94,7 @@ function userRouter(settings) {
     router.get('/agenda', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
         res.render('my-profile/agenda', {
             settings,
+            footerNews: res.locals.news,
             nonce: res.locals.cspNonce,
             user: req.user,
         });
@@ -148,6 +151,7 @@ function userRouter(settings) {
                 const userData = results[0];
                 res.render('my-profile/profiel', {
                     settings,
+                    footerNews: res.locals.news,
                     nonce: res.locals.cspNonce,
                     user: req.user,
                     userData: userData
@@ -263,8 +267,8 @@ function userRouter(settings) {
         // Generate a QR Code for the user to scan
 
         qrcode.toDataURL(key.url, (err, dataUrl) => {
-            if (err) { return res.render('my-profile/2fa/setup-2fa', { settings, nonce: res.locals.cspNonce, user: req.user, qrCode: dataUrl, secret: null, error: 'Some error message here' }); }
-            res.render('my-profile/2fa/setup-2fa', { settings, nonce: res.locals.cspNonce, user: req.user, qrCode: dataUrl, secret: key.secret });
+            if (err) { return res.render('my-profile/2fa/setup-2fa', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user, qrCode: dataUrl, secret: null, error: 'Some error message here' }); }
+            res.render('my-profile/2fa/setup-2fa', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user, qrCode: dataUrl, secret: key.secret });
         });
     });
 
@@ -289,9 +293,7 @@ function userRouter(settings) {
 
     // check 2FA
     router.get('/prompt-2fa', ensureAuthenticatedUser, (req, res, next) => {
-        if (!req.user.hasFA) { return res.redirect(`/${settings.profileRoute}/profiel`); }
-        if (req.session.is2faVerified) { return res.redirect(`/${settings.profileRoute}/profiel`); }
-        return res.render('my-profile/2fa/prompt-2fa', { settings, nonce: res.locals.cspNonce, user: undefined });
+        return res.render('my-profile/2fa/prompt-2fa', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: undefined });
     });
 
 
@@ -311,9 +313,9 @@ function userRouter(settings) {
                     return res.redirect('/my-profile/profiel');
                 }
 
-                res.render('my-profile/2fa/prompt-2fa', { settings, nonce: res.locals.cspNonce, user: undefined, error: 'Invalid token. Please try again.' });
+                res.render('my-profile/2fa/prompt-2fa', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: undefined, error: 'Invalid token. Please try again.' });
             } catch (error) {
-                res.render('my-profile/2fa/prompt-2fa', { settings, nonce: res.locals.cspNonce, user: undefined, error: 'Invalid token. Please try again.' });
+                res.render('my-profile/2fa/prompt-2fa', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: undefined, error: 'Invalid token. Please try again.' });
             }
         });
     });
@@ -322,7 +324,7 @@ function userRouter(settings) {
     // remove 2FA
 
     router.get('/remove-2fa', ensureAuthenticatedUser, (req, res) => {
-        res.render('my-profile/2fa/prompt-remove-2fa', { settings, nonce: res.locals.cspNonce });  // This should be a view where the user inputs their current 2FA code to remove it
+        res.render('my-profile/2fa/prompt-remove-2fa', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce });  // This should be a view where the user inputs their current 2FA code to remove it
     });
 
 
@@ -343,7 +345,7 @@ function userRouter(settings) {
                     res.send('2FA removed successfully');
                 });
             } else {
-                res.render('my-profile/2fa/prompt-remove-2fa', { settings, nonce: res.locals.cspNonce, error: 'Invalid token. Please try again.' });
+                res.render('my-profile/2fa/prompt-remove-2fa', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, error: 'Invalid token. Please try again.' });
             }
         });
     });

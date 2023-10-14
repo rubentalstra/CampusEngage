@@ -5,6 +5,35 @@
         <div class="headline">
           <h3>Laatste nieuws</h3>
         </div>
+
+
+        <% footerNews.forEach((article) => { %>
+        <dl class="dl-horizontal headlines headlines-footer">
+          <dt>
+            <a href="/nieuws/<%= article.url %>" title="<%= article.title %>"> <img src="<%= article.image_path %>"> </a>
+          </dt>
+          <dd>
+            <a href="/nieuws/<%= article.url %>" title="<%= article.title %>"><%= article.title %></a>
+            <ul class="list-unstyled list-inline text-muted small">
+              <li><time data-datetime="<%= article.date %>"><%= article.dateString %></time></li>
+            </ul>
+          </dd>
+        </dl>
+        <% }); %>
+
+        <!-- <dl class="dl-horizontal headlines headlines-footer">
+          <dt>
+            <a href="/vereniging/nieuws/terugblik-bedrijfsbezoek-van-schie" title="Terugblik bedrijfsbezoek Van Schie"> <img src="https://congressus-vibderondevenen.s3-eu-west-1.amazonaws.com/files/a8674b521e3346b7af66ed4cd29b8318-sm.jpg"> </a>
+          </dt>
+          <dd>
+            <a href="/vereniging/nieuws/terugblik-bedrijfsbezoek-van-schie" title="Terugblik bedrijfsbezoek Van Schie">Terugblik bedrijfsbezoek Van Schie</a>
+            <ul class="list-unstyled list-inline text-muted small">
+              <li><time data-datetime="2023-06-20 15:40:00">4 maanden geleden</time></li>
+            </ul>
+          </dd>
+        </dl> -->
+
+
       </div>
       <div class="col-xs-12 col-sm-4">
         <div class="headline">
