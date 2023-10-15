@@ -11,7 +11,7 @@ exports.getEventsTicketsPage = async (req, res) => {
     try {
 
 
-        const [result, tickets, event] = await Promise.all([query(`
+        const [result, tickets, event, countries] = await Promise.all([query(`
         SELECT
         Attendees.MemberID
     FROM
@@ -22,10 +22,15 @@ exports.getEventsTicketsPage = async (req, res) => {
         AND Attendees.MemberID = ?
         AND Attendees.GuestName IS NULL
         AND Attendees.Refunded = 0
-      `, [EventID, MemberID]), query(`SELECT * FROM Tickets WHERE EventID = ?`, [EventID]), query(`SELECT * FROM Events WHERE EventID = ?`, [EventID])]);
+      `, [EventID, MemberID]),
+        query(`SELECT * FROM Tickets WHERE EventID = ?`, [EventID]),
+        query(`SELECT * FROM Events WHERE EventID = ?`, [EventID]),
+        query('SELECT country_name FROM countries ORDER BY country_name ASC')
+        ]);
 
 
-        return res.render('evenementen/confirm', { ...res.locals.commonFields, hasTicket: result[0], tickets: tickets, event: event[0] });
+
+        return res.render('evenementen/confirm', { ...res.locals.commonFields, hasTicket: result[0], tickets: tickets, event: event[0], countries: countries });
         // return result[0];  // return ID of the new record
     } catch (error) {
         console.error(error);

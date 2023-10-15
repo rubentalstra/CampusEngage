@@ -12,7 +12,7 @@ const eventRouter = express.Router();
 
 eventRouter.get('/', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
     const events = await getEvents(req, res);
-    res.render('evenementen', { ...res.locals.commonFields, events: events });
+    res.render('evenementen/index', { ...res.locals.commonFields, events: events });
 });
 
 
@@ -31,7 +31,6 @@ eventRouter.get('/:EventID', ensureAuthenticatedUser, userEnsure2fa, async (req,
 
 
 eventRouter.get('/:EventID/tickets', ensureAuthenticatedUser, userEnsure2fa, getEventsTicketsPage);
-// router.get('/:EventID/sign-up', ensureAuthenticatedUser, userEnsure2fa, createOrder);
 eventRouter.post('/:EventID/sign-up', ensureAuthenticatedUser, userEnsure2fa, createOrder);
 
 

@@ -73,32 +73,6 @@ userRouter.post('/set-password', (req, res) => {
     });
 });
 
-userRouter.get('/profiel/2fa', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
-    res.render('my-profile/2fa', {
-        ...res.locals.commonFields
-    });
-});
-
-userRouter.get('/uitschrijven', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
-    res.render('my-profile/uitschrijven', {
-        ...res.locals.commonFields
-    });
-});
-
-userRouter.get('/agenda', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
-    res.render('my-profile/agenda', {
-        ...res.locals.commonFields
-    });
-});
-
-
-
-
-
-/**
- * IMAGE SETUP
- */
-
 
 
 userRouter.get('/profiel', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
@@ -149,6 +123,52 @@ userRouter.get('/profiel', ensureAuthenticatedUser, userEnsure2fa, (req, res) =>
         }
     });
 });
+
+
+
+userRouter.get('/profiel/2fa', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
+    res.render('my-profile/profile/2fa', {
+        ...res.locals.commonFields
+    });
+});
+
+userRouter.get('/profiel/groepen', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
+    res.render('my-profile/profile/groepen', {
+        ...res.locals.commonFields
+    });
+});
+
+userRouter.get('/profiel/evenementen', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
+    res.render('my-profile/profile/evenementen', {
+        ...res.locals.commonFields
+    });
+});
+
+userRouter.get('/profiel/facturen', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
+    res.render('my-profile/profile/invoices', {
+        ...res.locals.commonFields
+    });
+});
+
+userRouter.get('/uitschrijven', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
+    res.render('my-profile/uitschrijven', {
+        ...res.locals.commonFields
+    });
+});
+
+userRouter.get('/agenda', ensureAuthenticatedUser, userEnsure2fa, (req, res) => {
+    res.render('my-profile/agenda', {
+        ...res.locals.commonFields
+    });
+});
+
+
+
+
+/**
+ * IMAGE SETUP
+ */
+
 
 userRouter.post('/upload', ensureAuthenticatedUser, userEnsure2fa, upload.single('profilePic'), (req, res) => {
     const userId = req.user.id;
@@ -258,8 +278,8 @@ userRouter.get('/setup-2fa', ensureAuthenticatedUser, (req, res) => {
     // Generate a QR Code for the user to scan
 
     qrcode.toDataURL(key.url, (err, dataUrl) => {
-        if (err) { return res.render('my-profile/2fa/setup-2fa', { ...res.locals.commonFields, qrCode: dataUrl, secret: null, error: 'Some error message here' }); }
-        res.render('my-profile/2fa/setup-2fa', { ...res.locals.commonFields, qrCode: dataUrl, secret: key.secret });
+        if (err) { return res.render('my-profile/profile/2fa/setup-2fa', { ...res.locals.commonFields, qrCode: dataUrl, secret: null, error: 'Some error message here' }); }
+        res.render('my-profile/profile/2fa/setup-2fa', { ...res.locals.commonFields, qrCode: dataUrl, secret: key.secret });
     });
 });
 
@@ -284,7 +304,7 @@ userRouter.post('/verify-2fa', ensureAuthenticatedUser, (req, res) => {
 
 // check 2FA
 userRouter.get('/prompt-2fa', ensureAuthenticatedUser, (req, res, next) => {
-    return res.render('my-profile/2fa/prompt-2fa', { ...res.locals.commonFields });
+    return res.render('my-profile/profile/2fa/prompt-2fa', { ...res.locals.commonFields });
 });
 
 
@@ -304,9 +324,9 @@ userRouter.post('/check-2fa', ensureAuthenticatedUser, (req, res) => {
                 return res.redirect('/my-profile/profiel');
             }
 
-            res.render('my-profile/2fa/prompt-2fa', { ...res.locals.commonFields, error: 'Invalid token. Please try again.' });
+            res.render('my-profile/profile/2fa/prompt-2fa', { ...res.locals.commonFields, error: 'Invalid token. Please try again.' });
         } catch (error) {
-            res.render('my-profile/2fa/prompt-2fa', { ...res.locals.commonFields, error: 'Invalid token. Please try again.' });
+            res.render('my-profile/profile/2fa/prompt-2fa', { ...res.locals.commonFields, error: 'Invalid token. Please try again.' });
         }
     });
 });
@@ -315,7 +335,7 @@ userRouter.post('/check-2fa', ensureAuthenticatedUser, (req, res) => {
 // remove 2FA
 
 userRouter.get('/remove-2fa', ensureAuthenticatedUser, (req, res) => {
-    res.render('my-profile/2fa/prompt-remove-2fa', { ...res.locals.commonFields });  // This should be a view where the user inputs their current 2FA code to remove it
+    res.render('my-profile/profile/2fa/prompt-remove-2fa', { ...res.locals.commonFields });  // This should be a view where the user inputs their current 2FA code to remove it
 });
 
 
@@ -336,7 +356,7 @@ userRouter.post('/confirm-remove-2fa', ensureAuthenticatedUser, (req, res) => {
                 res.send('2FA removed successfully');
             });
         } else {
-            res.render('my-profile/2fa/prompt-remove-2fa', { ...res.locals.commonFields, error: 'Invalid token. Please try again.' });
+            res.render('my-profile/profile/2fa/prompt-remove-2fa', { ...res.locals.commonFields, error: 'Invalid token. Please try again.' });
         }
     });
 });

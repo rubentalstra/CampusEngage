@@ -5,9 +5,9 @@
 <head>
   <title>RealTime - Evenementen</title>
 
-  <%- include('includes/meta', {}); %>
+  <%- include('../includes/meta', {}); %>
 
-  <%- include('includes/headLink', {}); %>
+  <%- include('../includes/headLink', {}); %>
 
   <style>
     .content-header-background {
@@ -18,7 +18,7 @@
 
 <body class="template-content webpage-5437 module-profile authenticated-user">
 
-  <%- include('includes/header', {settings, user: user}); %>
+  <%- include('../includes/header', {settings, user: user}); %>
 
   <section id="content">
     <div class="content-header content-header-background">
@@ -47,10 +47,20 @@
         <div class="paragraphs col-md-9">
 
 
+
+
+
           <div class="row">
 
             <% events.forEach(element => { %>
-            <div class="col-md-10">
+            <% if (element.image_path) { %>
+            <div class="col-md-4">
+              <a href="/evenementen/<%= element.EventID  %>" title="<%= element.Name  %>" class="img-16by9-cover img-headline">
+                <img src="<%= element.image_path  %>" alt="<%= element.Name  %>" class="img-responsive">
+              </a>
+            </div>
+            <% } %>
+            <div class=" <%= element.image_path ? 'ol-md-8': 'ol-md-10' %>">
               <div class="event-header">
                 <h3><a href="/evenementen/<%= element.EventID  %>" title="<%= element.Name  %>"><%= element.Name  %></a></h3>
                 <ul class="list-unstyled list-inline text-muted small meta-list">
@@ -167,7 +177,7 @@
         </div>
 
 
-        <%- include('includes/partners.ejs'); %>
+        <%- include('../includes/partners.ejs'); %>
 
 
       </div>
@@ -178,7 +188,7 @@
 
 
 
-  <%- include('includes/footer'); %>
+  <%- include('../includes/footer'); %>
 
   <!-- generic javascript -->
 

@@ -134,6 +134,12 @@
         <div class="paragraphs col-md-9">
           <div class="row">
             <div class=" col-md-12 paragraph-text">
+              <% if (eventDetails.image_path) { %>
+              <p class="heading-image">
+                <img src="<%= eventDetails.image_path  %>" alt="<%= eventDetails.Name  %>" class="img-responsive margin-bottom-20">
+              </p>
+
+              <% } %>
               <%- eventDetails.Notes %>
               <div class="headline margin-top-40">
                 <h4>Deelnemers <small>– <strong><%= attendance.reduce((n, {Tickets}) => n + Tickets, 0) %></strong><span class="small text-muted"> / <%= eventDetails.AvailableQuantity %> </span></small></h4>

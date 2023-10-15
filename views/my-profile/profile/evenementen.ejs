@@ -5,9 +5,9 @@
 <head>
   <title>RealTime - Profiel</title>
 
-  <%- include('../includes/meta', {}); %>
+  <%- include('../../includes/meta', {}); %>
 
-  <%- include('../includes/headLink', {}); %>
+  <%- include('../../includes/headLink', {}); %>
 
   <style>
     .content-header-background {
@@ -18,7 +18,7 @@
 
 <body class="template-content webpage-5437 module-profile authenticated-user">
 
-  <%- include('../includes/header', {settings, user: user}); %>
+  <%- include('../../includes/header', {settings, user: user}); %>
 
 
   <section id="content">
@@ -26,9 +26,9 @@
       <div class="container">
         <ol class="breadcrumb">
           <li><a href="/<%= settings.profileRoute %>">Mijn RealTime</a></li>
-          <li class="active">2FA Settings</li>
+          <li class="active">Mijn evenementen</li>
         </ol>
-        <h2>Two-Factor Authentication Settings</h2>
+        <h2>Mijn evenementen</h2>
       </div>
     </div>
     <div class="container">
@@ -38,12 +38,12 @@
             <li>
               <a href="/<%= settings.profileRoute %>/profiel" title="">Profiel</a>
               <ul>
-                <li class="active">
+                <li>
                   <a href="/<%= settings.profileRoute %>/profiel/2fa" title="">2FA Settings</a>
                 <li>
                 <li>
                   <a href="/<%= settings.profileRoute %>/profiel/groepen" title="">Mijn groepen</a>
-                <li>
+                <li class="active">
                   <a href="/<%= settings.profileRoute %>/profiel/evenementen" title="">Mijn evenementen</a>
                 <li>
                   <a href="/<%= settings.profileRoute %>/profiel/facturen" title="">Mijn facturen</a>
@@ -66,20 +66,75 @@
             </li>
           </ul>
         </div>
+
+
         <div class="paragraphs col-md-9">
-          <div class="row">
-            <div class="col-md-12 paragraph-text paragraph-text-view">
-              <% if(user.hasFA) { %>
-              <p>You have already set up Two-Factor Authentication for added security. If you'd like to remove it:</p>
-              <a href="/<%= settings.profileRoute %>/remove-2fa" class="btn btn-danger">Remove 2FA</a>
-              <% } else { %>
-              <p>Enhance the security of your account by setting up Two-Factor Authentication.</p>
-              <a href="/<%= settings.profileRoute %>/setup-2fa" class="btn btn-primary">Setup 2FA</a>
-              <% } %>
-            </div>
+          <div class="headline">
+            <h4>Binnenkort</h4>
           </div>
+          <table class="table table-striped table-condensed">
+            <thead>
+              <tr>
+                <th>Evenement</th>
+                <th class="column-large">Start</th>
+                <th class="column-small">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="/evenementen/87044-kerstdiner">Kerstdiner</a></td>
+                <td>20 dec. 2023 18:30</td>
+                <td><span class="label label-success">aangemeld</span></td>
+              </tr>
+              <tr>
+                <td><a href="/evenementen/86743-lasergamen">Lasergamen</a></td>
+                <td>21 nov. 2023 21:00</td>
+                <td><span class="label label-success">aangemeld</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>&nbsp;</p>
+
+          <div class="headline">
+            <h4>Afgelopen evenementen</h4>
+          </div>
+          <table class="table table-striped table-condensed">
+            <thead>
+              <tr>
+                <th>Evenement</th>
+                <th class="column-large">Start</th>
+                <th class="column-small">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="/evenementen/85662-bowlen">Bowlen</a></td>
+                <td>11 okt. 2023 20:00</td>
+                <td><span class="label label-success">aangemeld</span></td>
+              </tr>
+              <tr>
+                <td><a href="/evenementen/85662-bowlen">Bowlen</a></td>
+                <td>11 okt. 2023 20:00</td>
+                <td><span class="label label-default">afgemeld</span></td>
+              </tr>
+              <tr>
+                <td><a href="/evenementen/thefactore-aws-cloud">TheFactorE AWS Cloud</a></td>
+                <td>28 sep. 2023 16:00</td>
+                <td><span class="label label-success">aangemeld</span></td>
+              </tr>
+              <tr>
+                <td><a href="/evenementen/84430-karten">Karten</a></td>
+                <td>20 sep. 2023 19:30</td>
+                <td><span class="label label-success">aangemeld</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <%- include('../includes/partners.ejs'); %>
+
+
+
+        <%- include('../../includes/partners.ejs'); %>
       </div>
     </div>
   </section>
@@ -88,7 +143,7 @@
 
 
 
-  <%- include('../includes/footer'); %>
+  <%- include('../../includes/footer'); %>
 
   <!-- generic javascript -->
 

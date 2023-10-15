@@ -1039,9 +1039,99 @@
               </div>
 
               <!-- Editable Form (Initially Hidden) -->
-              <div id="editForm" class="py-6 lg:py-8 hidden">
+              <div id="editForm" class=" hidden">
+                <!--  -->
+
+
+
+                <!-- <section aria-labelledby="cart-options" class="lg:col-span-7"> -->
+                <div class="py-4 lg:py-8">
+
+
+
+                  <div class="flex items-start justify-between">
+                    <div>
+                      <h3 class="text-lg font-medium text-gray-900">Geadresseerde</h3>
+
+                    </div>
+                    <div>
+                      <a href="#" id="cancelLink" class="text-sm text-primary/85 transition hover:underline hover:text-primary">cancel</a>
+                    </div>
+                  </div>
+
+                  <div class="mt-6">
+                    <fieldset class="mb-4">
+                      <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-4">
+                        <div class="sm:col-span-6 xl:col-span-4">
+                          <div class="flex">
+                            <label for="addressee" class="block text-sm font-semibold leading-5 text-gray-600">Naam</label>
+                            <span class="pl-0.5 text-base font-semibold leading-4 text-gray-600/75">*</span>
+                          </div>
+                          <div class="relative rounded shadow-sm">
+                            <input autofocus class="block w-full mt-1 rounded default-input-border sm:text-sm sm:leading-6" id="addressee" name="addressee" required type="text" value="Ruben Daniël Talstra">
+                          </div>
+                        </div>
+                        <div class="sm:col-span-6 xl:col-span-4">
+                          <div class="flex">
+                            <label for="email" class="block text-sm font-semibold leading-5 text-gray-600">E-mail</label>
+                            <span class="pl-0.5 text-base font-semibold leading-4 text-gray-600/75">*</span>
+                          </div>
+                          <div class="relative rounded shadow-sm">
+                            <input autofocus class="block w-full mt-1 rounded default-input-border sm:text-sm sm:leading-6" id="email" name="email" required type="email" value="r.d.talstra@st.hanze.nl">
+                          </div>
+                        </div>
+                      </div>
+                    </fieldset>
+                  </div>
+                </div>
+                <div class="py-4 lg:py-8">
+                  <h3 class="text-lg font-medium text-gray-900">Factuurgegevens</h3>
+                  <fieldset class="mb-4">
+                    <div class="grid grid-cols-1 gap-y-1 gap-x-4 sm:grid-cols-4">
+                      <div class="sm:col-span-4 xl:col-span-4">
+                        <label class="block text-sm xl:text-sm font-semibold leading-5 text-gray-600" for="address-address">Factuuradres*</label>
+                        <textarea class="form-control address address-address rounded default-input-border" id="address-address" name="address_address" placeholder="Adres">Het Blauwgras 23</textarea>
+                      </div>
+                      <div class="sm:col-span-2 xl:col-span-2">
+                        <label class="block text-sm xl:text-sm font-semibold leading-5 text-gray-600" for="address-zip">Postcode</label>
+                        <input class="form-control address address-zip rounded default-input-border sm:text-sm sm:leading-6" id="address-zip" name="address_zip" placeholder="Postcode" type="text" value="9203 HJ">
+                      </div>
+                      <div class="sm:col-span-2 xl:col-span-2">
+                        <label class="block text-sm xl:text-sm font-semibold leading-5 text-gray-600" for="address-city">Stad</label>
+                        <input class="form-control address address-city rounded default-input-border sm:text-sm sm:leading-6" id="address-city" name="address_city" placeholder="Stad" type="text" value="Drachten">
+                      </div>
+                      <div class="sm:col-span-4 xl:col-span-4">
+                        <label class="block text-sm xl:text-sm font-semibold leading-5 text-gray-600" for="address-country">Land</label>
+                        <select class="form-control address address-country rounded default-input-border" id="address-country" name="address_country" placeholder="Land">
+                          <% countries.forEach(country => { %>
+                          <option value="<%= country.country_name %>" <%= country.country_name === 'Netherlands' ? 'selected' : '' %>>
+                            <%= country.country_name %>
+                          </option>
+                          <% }); %>
+                        </select>
+                      </div>
+                    </div>
+
+                    <br>
+                    <div class="sm:col-span-6 xl:col-span-4">
+                      <div class="flex ">
+                        <label for="invoice_reference" class="block text-sm xl:text-sm font-semibold leading-5 text-gray-600">Referentie</label>
+                      </div>
+                      <div class="relative rounded shadow-sm">
+                        <input autofocus class="block w-full mt-1 rounded default-input-border sm:text-sm sm:leading-6" data-type="" id="invoice_reference" name="invoice_reference" placeholder="" type="text" value="">
+                      </div>
+                      <p class="my-1 max-w-xl text-xs text-gray-400">bijv. PO-nummer of kostenplaats</p>
+                    </div>
+
+                  </fieldset>
+                </div>
+
+
+
+
+
                 <!-- ...form fields... -->
-                <a href="#" id="cancelLink" class="text-sm text-primary/85 transition hover:underline hover:text-primary">cancel</a>
+                <!-- <a href="#" id="cancelLink" class="text-sm text-primary/85 transition hover:underline hover:text-primary">cancel</a> -->
                 <button type="submit" id="saveButton">Save</button>
               </div>
 
@@ -1200,11 +1290,11 @@
         editForm.classList.toggle('hidden');
 
         // Optionally, populate form fields with current read-only data
-        document.getElementById('addressee').value = 'Ruben Daniël Talstra';
-        document.getElementById('email').value = 'r.d.talstra@st.hanze.nl';
-        document.getElementById('address-address').value = 'Het Blauwgras 23';
-        document.getElementById('address-zip').value = '9203 HJ';
-        document.getElementById('address-city').value = 'Drachten';
+        // document.getElementById('addressee').value = 'Ruben Daniël Talstra';
+        // document.getElementById('email').value = 'r.d.talstra@st.hanze.nl';
+        // document.getElementById('address-address').value = 'Het Blauwgras 23';
+        // document.getElementById('address-zip').value = '9203 HJ';
+        // document.getElementById('address-city').value = 'Drachten';
         // ...set values for other fields as needed...
       }
       // });
@@ -1370,6 +1460,11 @@
             }
           }
         });
+        console.log(attendees)
+
+        // if (attendees.length == 0) {
+        //   return alert('no one?')
+        // }
 
         // Now you can submit the form manually or via fetch API or any other way you prefer.
         // For this example, we will use fetch API:
