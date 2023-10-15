@@ -223,25 +223,15 @@ function initRouter(settings) {
 
 
             // Generate a UUID in Node.js
-            const generatedUUID = uuidv4();
+            // const generatedUUID = uuidv4();
 
-            // Insert into address_info table first
-
-            connection.query('INSERT INTO address_info (id, street_address, postal_code, city, country_id) VALUES (?, ?, ?, ?, ?)', [generatedUUID, address, zip, city, country], (error) => {
+            connection.query('INSERT INTO Members (initials, first_name, primary_last_name_prefix, primary_last_name_main, geslacht, geboortedatum, emailadres, studentnummer, vaste_telefoon, street_address, postal_code, city, iban, bic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [initials, firstName, lastNamePrefix, lastNameMain, gender, dateOfBirth, email, studentNumber, phoneHome, address, zip, city, country, iban, bic], (error) => {
                 if (error) {
                     console.error(error);
-                    return res.status(500).send('Server error while inserting address');
+                    return res.status(500).send('Server error while inserting member');
                 }
 
-                // Now insert into Members table using the generatedUUID as address_id
-                connection.query('INSERT INTO Members (initials, first_name, primary_last_name_prefix, primary_last_name_main, geslacht, geboortedatum, emailadres, studentnummer, vaste_telefoon, address_id, iban, bic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [initials, firstName, lastNamePrefix, lastNameMain, gender, dateOfBirth, email, studentNumber, phoneHome, generatedUUID, iban, bic], (error) => {
-                    if (error) {
-                        console.error(error);
-                        return res.status(500).send('Server error while inserting member');
-                    }
-
-                    res.json({ success: true });
-                });
+                res.json({ success: true });
             });
 
         });

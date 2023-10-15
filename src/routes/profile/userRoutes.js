@@ -97,14 +97,13 @@ userRouter.get('/profiel', ensureAuthenticatedUser, userEnsure2fa, (req, res) =>
         studentnummer,
         lid_sinds,
         imagePath,
-        address_info.street_address,
-        address_info.postal_code,
-        address_info.city,
+        street_address,
+        postal_code,
+        city,
         countries.country_name
     FROM
         Members
-        LEFT JOIN address_info ON Members.address_id = address_info.id
-        LEFT JOIN countries ON address_info.country_id = countries.country_id
+        LEFT JOIN countries ON Members.country_id = countries.country_id
     WHERE
         Members.id = ?`, [userId], function (error, results) {
         if (error) {
