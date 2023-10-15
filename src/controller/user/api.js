@@ -3,15 +3,19 @@ const query = require('../../config/database-all');
 exports.getCalendarJson = async (req, res) => {
 
     try {
+        const startDate = req.query.start;
+        const endDate = req.query.end;
 
-        // Insert OrderRow into the database
-        const sql = `SELECT Events.*, EventCategories.EventCategoryName FROM Events 
+        // Your SQL query with a WHERE condition to filter events by date
+        const sql = `
+            SELECT Events.*, EventCategories.EventCategoryName 
+            FROM Events 
+            LEFT JOIN EventCategories ON Events.EventCategoryID = EventCategories.EventCategoryID
+            WHERE Published = "published" 
+            AND StartDateTime BETWEEN ? AND ?
+            ORDER BY StartDateTime ASC`;
 
-        LEFT JOIN EventCategories ON Events.EventCategoryID = EventCategories.EventCategoryID
-        
-        WHERE Published = "published" ORDER BY StartDateTime ASC`;
-        const results = await query(sql);
-
+        const results = await query(sql, [startDate, endDate]);
         // Format the data as needed
         const formattedResults = results.map(event => ({
             allDay: event.AllDay,

@@ -54,9 +54,8 @@
         </div>
 
         <div class="paragraphs col-md-9">
+
           <div id="events-calendar" class="fc fc-unthemed fc-ltr">
-
-
           </div>
 
           <p>
@@ -93,9 +92,7 @@
 
   <script src="/js/core/index.global.min.js"></script>
   <script src="/js/daygrid/index.global.min.js"></script>
-
-
-  <script src="/js/core/locales/nl.js"></script>
+  <script src="/js/core/locales-all.global.min.js"></script>
 
 
 
@@ -113,36 +110,25 @@
       });
     });
 
-
-
     document.addEventListener('DOMContentLoaded', function() {
+      var userLang = navigator.language || navigator.userLanguage;
+      var initialLocaleCode = userLang.split('-')[0];
+
       var calendarEl = document.getElementById('events-calendar');
       var calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: initialLocaleCode,
         initialView: 'dayGridMonth',
-        events: '/evenementen/calendar/json'
+        weekNumbers: true,
+        events: function(fetchInfo, successCallback, failureCallback) {
+          fetch(`/evenementen/calendar/json?start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`)
+            .then(response => response.json())
+            .then(events => successCallback(events))
+            .catch(error => failureCallback(error));
+        }
       });
+
       calendar.render();
     });
-
-    // $(document).ready(function() {
-    //   $('#events-calendar').fullCalendar({
-    //     header: {
-    //       left: 'prev,next today',
-    //       center: 'title',
-    //       right: 'month,agendaWeek,agendaDay'
-    //     },
-    //     locale: 'nl',
-    //     timeFormat: 'H:mm',
-    //     defaultDate: '2023-09-30',
-    //     defaultView: 'month',
-    //     weekends: true,
-    //     minTime: '00:00:00',
-    //     maxTime: '24:00:00',
-    //     contentHeight: 'auto',
-    //     allDaySlot: true,
-    //     events: '/evenementen/calendar/json'
-    //   });
-    // });
   </script>
 
 
