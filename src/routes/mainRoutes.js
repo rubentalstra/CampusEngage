@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const passportUser = require('../config/passportUsers');
-const userRouter = require('./userRoutes');
+const userRouter = require('./profile/userRoutes');
 const connection = require('../config/database');
 const transporter = require('../utilities/mailer');
 const { generateToken } = require('../utilities/crypto');
@@ -16,18 +16,14 @@ const { ensureAuthenticatedUser, userEnsure2fa } = require('../middleware/auth')
 const eventRouter = require('./event/eventRoutes');
 const { getCssStyles } = require('../controller/css');
 const isValidRedirectURL = require('../utilities/isValidRedirectURL');
-const { fetchAndRenderArticles, fetchAndRenderArticleDetails, insertArticle, fetchArticlesForFooter } = require('../utilities/newsFunctions');
+const { fetchArticlesForFooter } = require('../utilities/newsFunctions');
+const newsRoutes = require('./news/newsRoutes');
 
 
 
 
 // Function to initialize router with settings
 function initRouter(settings) {
-    // Dynamic route based on settings
-    // router.get(`/${settings.profileRoute}`, (req, res) => {
-    //     res.send(`Hello from ${settings.profileRoute}!`);
-    // });
-
 
     const getRedirectURL = (req) => {
         // Default behavior
@@ -60,18 +56,31 @@ function initRouter(settings) {
             // console.log(req.session);
             // console.log(req.user);
             req.session.userType = 'user';
-            res.locals.settings = settings;
-            res.locals.news = await fetchArticlesForFooter(req, res);
             next(); // Proceed to the next middleware or route handler
         }
     });
 
 
+    const commonFieldsMiddleware = async (req, res, next) => {
+
+        const footerNews = await fetchArticlesForFooter(req, res);
+
+        res.locals.commonFields = {
+            settings: settings,
+            footerNews: footerNews,
+            nonce: res.locals.cspNonce, // Assuming this is set in another middleware
+            user: req.user // Assuming this is set in another middleware
+        };
+        next();
+    };
+
+    router.use(commonFieldsMiddleware);
+
 
 
 
     router.get('/', async (req, res, next) => {
-        res.render('index', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user });
+        res.render('index', res.locals.commonFields);
     });
 
 
@@ -84,51 +93,23 @@ function initRouter(settings) {
         return res.sendFile(path.join(__dirname, '../../uploads/sponsors/', path.basename(imageName)));
     });
 
+    // START EVENTS
+    router.use('/evenementen', ensureAuthenticatedUser, userEnsure2fa, eventRouter);
+    // END EVENTS
 
-    router.use('/evenementen', ensureAuthenticatedUser, userEnsure2fa, eventRouter(settings));
-
-    // nieuws
-
-    router.get('/nieuws', (req, res) => {
-        const currentPage = 1;
-        fetchAndRenderArticles(settings, currentPage, req, res);
-    });
-
-    router.get('/nieuws/create', (req, res) => {
-        const newArticle = {
-            title: 'Your Article Title',
-            image_path: '/uploads/news/463e37fa67d54963af77d2ba1ed6b850.jpg',
-            content: 'Your article content here'
-        };
-
-        insertArticle(newArticle, results => {
-            console.log('Article inserted with ID:', results.insertId);
-        });
-    });
-
-    router.get('/nieuws/:url', (req, res) => {
-        const articleUrl = req.params.url;
-        fetchAndRenderArticleDetails(articleUrl, settings, req, res);
-    });
-
-
-    router.get('/nieuws/page/:page', (req, res) => {
-        const currentPage = parseInt(req.params.page, 10) || 1;
-        fetchAndRenderArticles(settings, currentPage, req, res);
-    });
-
-
-
-
+    // START NEWS
+    router.use('/nieuws', newsRoutes);
     // END NEWS
 
 
 
     router.get('/contact', (req, res, next) => {
-        res.render('contact', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user });
+        res.render('contact', {
+            ...res.locals.commonFields
+        });
     });
 
-    router.use(`/${settings.profileRoute}`, userRouter(settings));
+    router.use(`/${settings.profileRoute}`, userRouter);
 
     router.get(`/${settings.profileRoute}`, (req, res) => {
         res.redirect(`/${settings.profileRoute}/profiel`);
@@ -143,10 +124,7 @@ function initRouter(settings) {
             }
 
             res.render('lid-worden/lid-worden', {
-                settings,
-                footerNews: res.locals.news,
-                nonce: res.locals.cspNonce,
-                user: undefined,
+                ...res.locals.commonFields,
                 countries: countries
             });
         });
@@ -160,7 +138,7 @@ function initRouter(settings) {
             const parentPages = await Page.findAll();
 
             // Render the form
-            res.render('page-create', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, parentPages });
+            res.render('page-create', { ...res.locals.commonFields, parentPages });
         } catch (error) {
             console.error('Error fetching parent pages:', error);
             res.status(500).send('Server error');
@@ -207,7 +185,7 @@ function initRouter(settings) {
             return res.status(404).send('Page not found');
         }
 
-        res.render('layout', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, page, pages });
+        res.render('layout', { ...res.locals.commonFields, page, pages });
     });
 
     // END test create pages
@@ -277,7 +255,7 @@ function initRouter(settings) {
         }
 
         // If none of the above conditions met, Go to Login Page
-        res.render('login', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, next: req.query.next, user: undefined });
+        res.render('login', { ...res.locals.commonFields, next: req.query.next });
     });
 
 
@@ -318,7 +296,7 @@ function initRouter(settings) {
     });
 
     router.get('/password/forgot', (req, res) => {
-        res.render('reset-password', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: undefined });
+        res.render('reset-password', { ...res.locals.commonFields });
     });
 
     router.post('/password/forgot', (req, res) => {
@@ -373,7 +351,7 @@ function initRouter(settings) {
 
     router.get('/register', (req, res, next) => {
         console.log('Inside get');
-        res.render('register', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce });
+        res.render('register', { ...res.locals.commonFields });
 
     });
 
@@ -428,7 +406,7 @@ function initRouter(settings) {
     });
 
     router.get('/pending-approval', (req, res) => {
-        res.render(`my-profile/pending-approval`, { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce });
+        res.render(`my-profile/pending-approval`, { ...res.locals.commonFields });
     });
 
 
@@ -456,6 +434,12 @@ function initRouter(settings) {
         res.send('<h1>Sorry This username is taken </h1><p><a href="/register">Register with different username</a></p>');
 
     });
+
+    router.use((err, req, res, next) => {
+        console.error(err.stack);  // log the error stack in your server console
+        res.status(500).send(err.stack);
+    });
+
 
     return router;
 }

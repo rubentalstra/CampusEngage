@@ -5,55 +5,55 @@ const { createOrder } = require('../../utilities/order');
 const { getMyTicketsForEvent, getEventDetails, getAttendanceForEvent, getIfUserHasBoughtTicket, getEvents } = require('../../controller/mainController');
 const { createRefundPayment } = require('../../utilities/mollie');
 const { getEventsTicketsPage } = require('../../controller/eventController');
-const router = express.Router();
+const eventRouter = express.Router();
 
 
-function eventRouter(settings) {
+// function eventRouter(settings) {
 
-    router.get('/', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
-        const events = await getEvents(req, res);
-        res.render('evenementen', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user ?? undefined, events: events });
-    });
-
-
-    router.get('/calendar', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
-        res.render('evenementen/calendar', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user ?? undefined });
-    });
-    router.get('/calendar/json', ensureAuthenticatedUser, userEnsure2fa, getCalendarJson);
+eventRouter.get('/', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
+    const events = await getEvents(req, res);
+    res.render('evenementen', { ...res.locals.commonFields, events: events });
+});
 
 
-
-    router.get('/:EventID', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
-        const [eventDetails, attendance, CancelableUntil] = await Promise.all([getEventDetails(req, res), getAttendanceForEvent(req, res), getIfUserHasBoughtTicket(req, res)]);
-        res.render('evenementen/details', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user ?? undefined, eventDetails: eventDetails, attendance: attendance, cancelDate: CancelableUntil });
-    });
+eventRouter.get('/calendar', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
+    res.render('evenementen/calendar', { ...res.locals.commonFields });
+});
+eventRouter.get('/calendar/json', ensureAuthenticatedUser, userEnsure2fa, getCalendarJson);
 
 
 
-    router.get('/:EventID/tickets', ensureAuthenticatedUser, userEnsure2fa, getEventsTicketsPage);
-    // router.get('/:EventID/sign-up', ensureAuthenticatedUser, userEnsure2fa, createOrder);
-    router.post('/:EventID/sign-up', ensureAuthenticatedUser, userEnsure2fa, createOrder);
+eventRouter.get('/:EventID', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
+    const [eventDetails, attendance, CancelableUntil] = await Promise.all([getEventDetails(req, res), getAttendanceForEvent(req, res), getIfUserHasBoughtTicket(req, res)]);
+    res.render('evenementen/details', { ...res.locals.commonFields, eventDetails: eventDetails, attendance: attendance, cancelDate: CancelableUntil });
+});
 
 
 
-    router.get('/:EventID/participation/cancel', async (req, res) => {
-        const attendees = await getMyTicketsForEvent(req, res);
-        res.render('evenementen/tickets', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user ?? undefined, attendees: attendees, EventID: req.params.EventID });
-    });
-    router.post('/:EventID/participation/cancel', ensureAuthenticatedUser, userEnsure2fa, createRefundPayment);
-
-
-    // router.get('/createOrder', ensureAuthenticatedUser, userEnsure2fa, createOrder);
-    // router.get('/create-payment', ensureAuthenticatedUser, userEnsure2fa, createPayment);
-    // router.get('/refund', createRefundPayment);
-    // router.post('/redirect', ensureAuthenticatedUser, userEnsure2fa, webhookVerification);
+eventRouter.get('/:EventID/tickets', ensureAuthenticatedUser, userEnsure2fa, getEventsTicketsPage);
+// router.get('/:EventID/sign-up', ensureAuthenticatedUser, userEnsure2fa, createOrder);
+eventRouter.post('/:EventID/sign-up', ensureAuthenticatedUser, userEnsure2fa, createOrder);
 
 
 
+eventRouter.get('/:EventID/participation/cancel', async (req, res) => {
+    const attendees = await getMyTicketsForEvent(req, res);
+    res.render('evenementen/tickets', { ...res.locals.commonFields, attendees: attendees, EventID: req.params.EventID });
+});
+eventRouter.post('/:EventID/participation/cancel', ensureAuthenticatedUser, userEnsure2fa, createRefundPayment);
 
-    // ... (all other routes)
 
-    return router;
-}
+// router.get('/createOrder', ensureAuthenticatedUser, userEnsure2fa, createOrder);
+// router.get('/create-payment', ensureAuthenticatedUser, userEnsure2fa, createPayment);
+// router.get('/refund', createRefundPayment);
+// router.post('/redirect', ensureAuthenticatedUser, userEnsure2fa, webhookVerification);
+
+
+
+
+// ... (all other routes)
+
+//     return router;
+// }
 
 module.exports = eventRouter;

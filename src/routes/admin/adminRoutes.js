@@ -1,15 +1,15 @@
 const express = require('express');
 const { Totp } = require('time2fa');
 const qrcode = require('qrcode');
-const passportAdmins = require('../config/passportAdmins');
-const connection = require('../config/database');
-const { generateToken, genPassword } = require('../utilities/crypto');
-const { isAuth, ensureAuthenticatedAdmin, adminEnsure2fa } = require('../middleware/auth');
+const passportAdmins = require('../../config/passportAdmins');
+const connection = require('../../config/database');
+const { generateToken, genPassword } = require('../../utilities/crypto');
+const { isAuth, ensureAuthenticatedAdmin, adminEnsure2fa } = require('../../middleware/auth');
 
-const transporter = require('../utilities/mailer');
-const { getAdminDashboard, renderMemberPage } = require('../controller/adminController');
-const { userExists } = require('../middleware/utils');
-const adminApiRouter = require('./admin/api');
+const transporter = require('../../utilities/mailer');
+const { getAdminDashboard, renderMemberPage } = require('../../controller/adminController');
+const { userExists } = require('../../middleware/utils');
+const adminApiRouter = require('./api');
 const router = express.Router();
 
 // const { isAuth, ensure2fa } = require('../middleware/auth');

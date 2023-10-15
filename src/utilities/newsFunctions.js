@@ -34,7 +34,7 @@ function sanitizeTitleForUrl(title) {
 }
 
 
-function fetchAndRenderArticles(settings, currentPage, req, res) {
+function fetchAndRenderArticles(currentPage, req, res) {
     const articlesPerPage = 10; // or whatever value you choose
 
     connection.query('SELECT COUNT(*) as totalCount FROM newsArticles', (err, result) => {
@@ -59,26 +59,26 @@ function fetchAndRenderArticles(settings, currentPage, req, res) {
 
             // console.log(processedArticles);
 
-            res.render('news/index', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user, articles: processedArticles, currentPage, maxPage });
+            res.render('news/index', { ...res.locals.commonFields, articles: processedArticles, currentPage, maxPage });
         });
     });
 }
 
-function fetchAndRenderArticleDetails(articleUrl, settings, req, res) {
+function fetchAndRenderArticleDetails(articleUrl, req, res) {
     connection.query('SELECT * FROM newsArticles WHERE url = ?', [articleUrl], (err, results) => {
         if (err) { throw err; }
 
         if (results.length === 0) {
             // No article found with the given ID
             res.status(404);
-            return res.render('errors/404', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user });
+            return res.render('errors/404', { ...res.locals.commonFields, });
         }
 
         const article = results[0];
         const dateString = timeDifference(article.date);
         article.dateString = dateString;
 
-        res.render('news/details', { settings, footerNews: res.locals.news, nonce: res.locals.cspNonce, user: req.user, article });
+        res.render('news/details', { ...res.locals.commonFields, article });
     });
 }
 
