@@ -1,4 +1,6 @@
 const query = require('../config/database-all');
+const ics = require('ics');
+const stripAndShortenHTML = require('../utilities/stripAndShortenHTML');
 
 
 
@@ -54,5 +56,51 @@ exports.getEventsTicketsPage = async (req, res) => {
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 
+
+};
+
+
+
+exports.getEventIcal = async (req, res) => {
+
+    const eventsData = await query(`SELECT * from Events WHERE StartDateTime > CURRENT_TIMESTAMP`);
+
+
+    const processedEvents = eventsData.map(event => {
+        // Apply the stripAndShortenHTML function to the Notes field
+        const processedNotes = stripAndShortenHTML(event.Notes || '');
+
+        // Return the event with the processed Notes
+        return {
+            ...event,
+            Notes: processedNotes
+        };
+    });
+
+
+    // Convert them to iCal format
+    const icalEvents = processedEvents.map(event => {
+        const start = new Date(event.StartDateTime);
+        const end = new Date(event.EndDateTime);
+        return {
+            start: [start.getFullYear(), start.getMonth() + 1, start.getDate(), start.getHours(), start.getMinutes()],
+            end: [end.getFullYear(), end.getMonth() + 1, end.getDate(), end.getHours(), end.getMinutes()],
+            title: event.Name,
+            description: event.Notes,
+            // url: event.url
+            url: `/evenementen/${event.EventID}`
+        };
+    });
+
+    ics.createEvents(icalEvents, (error, value) => {
+        if (error) {
+            console.log(error);
+            res.status(500).send('Error generating iCal file');
+        } else {
+            res.setHeader('Content-Type', 'text/calendar');
+            res.setHeader('Content-Disposition', 'attachment; filename=events.ics');
+            res.send(value);
+        }
+    });
 
 };

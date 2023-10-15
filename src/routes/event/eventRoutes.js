@@ -4,7 +4,7 @@ const { getCalendarJson } = require('../../controller/user/api');
 const { createOrder } = require('../../utilities/order');
 const { getMyTicketsForEvent, getEventDetails, getAttendanceForEvent, getIfUserHasBoughtTicket, getEvents } = require('../../controller/mainController');
 const { createRefundPayment } = require('../../utilities/mollie');
-const { getEventsTicketsPage } = require('../../controller/eventController');
+const { getEventsTicketsPage, getEventIcal } = require('../../controller/eventController');
 const eventRouter = express.Router();
 
 
@@ -21,6 +21,8 @@ eventRouter.get('/calendar', ensureAuthenticatedUser, userEnsure2fa, async (req,
 });
 eventRouter.get('/calendar/json', ensureAuthenticatedUser, userEnsure2fa, getCalendarJson);
 
+eventRouter.get('/calendar/ics', ensureAuthenticatedUser, userEnsure2fa, getEventIcal);
+
 
 
 eventRouter.get('/:EventID', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
@@ -36,8 +38,8 @@ eventRouter.post('/:EventID/sign-up', ensureAuthenticatedUser, userEnsure2fa, cr
 
 
 eventRouter.get('/:EventID/participation/cancel', async (req, res) => {
-    const attendees = await getMyTicketsForEvent(req, res);
-    res.render('evenementen/tickets', { ...res.locals.commonFields, attendees: attendees, EventID: req.params.EventID });
+    const [eventDetails, attendees] = await Promise.all([getEventDetails(req, res), getMyTicketsForEvent(req, res)]);
+    res.render('evenementen/tickets', { ...res.locals.commonFields, attendees: attendees, eventDetails: eventDetails });
 });
 eventRouter.post('/:EventID/participation/cancel', ensureAuthenticatedUser, userEnsure2fa, createRefundPayment);
 
