@@ -1,10 +1,11 @@
 const express = require('express');
 const { ensureAuthenticatedUser, userEnsure2fa } = require('../../middleware/auth');
-const { getCalendarJson } = require('../../controller/user/api');
+
 const { createOrder } = require('../../utilities/order');
 const { getMyTicketsForEvent, getEventDetails, getAttendanceForEvent, getIfUserHasBoughtTicket, getEvents } = require('../../controller/mainController');
 const { createRefundPayment } = require('../../utilities/mollie');
-const { getEventsTicketsPage, getEventIcal } = require('../../controller/eventController');
+const { getCalendarJson, getEventIcal } = require('../../controller/event/eventApi');
+const { getEventsTicketsPage } = require('../../controller/event/eventController');
 const eventRouter = express.Router();
 
 
@@ -19,11 +20,10 @@ eventRouter.get('/', ensureAuthenticatedUser, userEnsure2fa, async (req, res) =>
 eventRouter.get('/calendar', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
     res.render('evenementen/calendar', { ...res.locals.commonFields });
 });
+// START API Routes
 eventRouter.get('/calendar/json', ensureAuthenticatedUser, userEnsure2fa, getCalendarJson);
-
 eventRouter.get('/calendar/ics', ensureAuthenticatedUser, userEnsure2fa, getEventIcal);
-
-
+// END API Routes
 
 eventRouter.get('/:EventID', ensureAuthenticatedUser, userEnsure2fa, async (req, res) => {
     const [eventDetails, attendance, CancelableUntil] = await Promise.all([getEventDetails(req, res), getAttendanceForEvent(req, res), getIfUserHasBoughtTicket(req, res)]);

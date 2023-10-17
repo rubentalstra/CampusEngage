@@ -1,29 +1,5 @@
 const connection = require('../config/database');
-const query = require('../config/database-all');
-const stripAndShortenHTML = require('./stripAndShortenHTML');
-const timeDifference = require('./timeDifference');
 
-
-
-async function fetchArticlesForFooter(req, res) {
-    try {
-        const articles = await query('SELECT url, title, image_path, date FROM newsArticles ORDER BY date DESC LIMIT 4');
-
-        const processedArticles = articles.map(article => {
-            const dateString = timeDifference(article.date);
-            return {
-                ...article,
-                dateString: dateString
-            };
-        });
-
-        return processedArticles;
-    } catch (dbError) {
-        console.error(dbError);
-        return [];
-        // res.status(500).send('Error occurred while updating payment status in database');
-    }
-}
 
 
 function sanitizeTitleForUrl(title) {
@@ -31,55 +7,6 @@ function sanitizeTitleForUrl(title) {
         .replace(/\s+/g, '-')  // replace spaces with hyphens
         .replace(/[^a-zA-Z0-9-]/g, '') // remove special characters except hyphens
         .toLowerCase();
-}
-
-
-function fetchAndRenderArticles(currentPage, req, res) {
-    const articlesPerPage = 10; // or whatever value you choose
-
-    connection.query('SELECT COUNT(*) as totalCount FROM newsArticles', (err, result) => {
-        if (err) { throw err; }
-
-        const totalArticles = result[0].totalCount;
-        const maxPage = Math.ceil(totalArticles / articlesPerPage);
-
-        const offset = (currentPage - 1) * articlesPerPage;
-        connection.query('SELECT * FROM newsArticles ORDER BY date DESC LIMIT ?,?', [offset, articlesPerPage], (err, articles) => {
-            if (err) { throw err; }
-
-            const processedArticles = articles.map(article => {
-                const processedContent = stripAndShortenHTML(article.content || '');
-                const dateString = timeDifference(article.date);
-                return {
-                    ...article,
-                    content: processedContent,
-                    dateString: dateString
-                };
-            });
-
-            // console.log(processedArticles);
-
-            res.render('news/index', { ...res.locals.commonFields, articles: processedArticles, currentPage, maxPage });
-        });
-    });
-}
-
-function fetchAndRenderArticleDetails(articleUrl, req, res) {
-    connection.query('SELECT * FROM newsArticles WHERE url = ?', [articleUrl], (err, results) => {
-        if (err) { throw err; }
-
-        if (results.length === 0) {
-            // No article found with the given ID
-            res.status(404);
-            return res.render('errors/404', { ...res.locals.commonFields, });
-        }
-
-        const article = results[0];
-        const dateString = timeDifference(article.date);
-        article.dateString = dateString;
-
-        res.render('news/details', { ...res.locals.commonFields, article });
-    });
 }
 
 
@@ -142,4 +69,4 @@ function insertArticle(article, callback) {
 
 
 
-module.exports = { fetchArticlesForFooter, fetchAndRenderArticles, fetchAndRenderArticleDetails, insertArticle };
+module.exports = { insertArticle };

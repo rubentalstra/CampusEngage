@@ -16,8 +16,8 @@ const { ensureAuthenticatedUser, userEnsure2fa } = require('../middleware/auth')
 const eventRouter = require('./event/eventRoutes');
 const { getCssStyles } = require('../controller/css');
 const isValidRedirectURL = require('../utilities/isValidRedirectURL');
-const { fetchArticlesForFooter } = require('../utilities/newsFunctions');
 const newsRoutes = require('./news/newsRoutes');
+const { fetchArticlesForFooter } = require('../controller/news/newsApi');
 
 
 

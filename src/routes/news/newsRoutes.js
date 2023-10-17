@@ -1,12 +1,12 @@
 const express = require('express');
-const { fetchAndRenderArticles, fetchAndRenderArticleDetails, insertArticle } = require('../../utilities/newsFunctions');
+const { fetchAndRenderArticleDetails, fetchAndRenderArticles } = require('../../controller/news/newsController');
+const { insertArticle } = require('../../utilities/newsFunctions');
+
 const newsRoutes = express.Router();
 
 
-newsRoutes.get('/', (req, res) => {
-    const currentPage = 1;
-    fetchAndRenderArticles(currentPage, req, res);
-});
+// the main index route.
+newsRoutes.get('/', fetchAndRenderArticles);
 
 newsRoutes.get('/create', (req, res) => {
     const newArticle = {
@@ -20,16 +20,10 @@ newsRoutes.get('/create', (req, res) => {
     });
 });
 
-newsRoutes.get('/:url', (req, res) => {
-    const articleUrl = req.params.url;
-    fetchAndRenderArticleDetails(articleUrl, req, res);
-});
-
-
-newsRoutes.get('/page/:page', (req, res) => {
-    const currentPage = parseInt(req.params.page, 10) || 1;
-    fetchAndRenderArticles(currentPage, req, res);
-});
+// Valid URL from the server. with the details information.
+newsRoutes.get('/:url', fetchAndRenderArticleDetails);
+// Going to a next age for a other page from the server.
+newsRoutes.get('/page/:page', fetchAndRenderArticles);
 
 
 
