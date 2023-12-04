@@ -47,7 +47,7 @@
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@sentry/webpack-plugin": "^2.8.0",
-    "eslint": "^8.51.0",
+    "eslint": "^8.55.0",
     "eslint-plugin-security-node": "^1.1.1"
   }
 }
